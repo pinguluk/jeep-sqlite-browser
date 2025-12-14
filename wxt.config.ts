@@ -19,6 +19,9 @@ export default defineConfig({
     version: '1.0.0',
     description: 'Browse and manage Jeep SQLite databases stored in IndexedDB',
     permissions: ['activeTab', 'storage'],
+    content_security_policy: {
+      extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+    },
   },
   webExt: {
     startUrls: ['http://localhost:5173/tabs/home'],

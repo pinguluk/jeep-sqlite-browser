@@ -40,11 +40,24 @@ export function Header() {
                 <Database className="w-5 h-5 text-primary" />
                 <span>Jeep SQLite Browser</span>
                 <span className="text-xs text-muted-foreground font-normal">v{VERSION}</span>
-                                {/* About Dialog */}
+                
+                {/* Donate Button */}
+                <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 px-2 text-pink-500 hover:text-pink-600 hover:bg-pink-100 dark:hover:bg-pink-950"
+                    onClick={openKoFi}
+                    title="Support on Ko-fi"
+                >
+                    <Heart className="w-3.5 h-3.5 mr-1 fill-current" />
+                    <span className="text-xs">Donate</span>
+                </Button>
+
+                {/* About Dialog */}
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" title="About">
-                            <Info className="w-4 h-4" />
+                        <Button variant="ghost" size="icon" className="h-6 w-6" title="About">
+                            <Info className="w-3.5 h-3.5" />
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-md">
@@ -66,18 +79,6 @@ export function Header() {
                         </DialogHeader>
                     </DialogContent>
                 </Dialog>
-
-                {/* Ko-fi Donate Button */}
-                <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-8 text-pink-500 hover:text-pink-600 hover:bg-pink-100 dark:hover:bg-pink-950"
-                    onClick={openKoFi}
-                    title="Support on Ko-fi"
-                >
-                    <Heart className="w-4 h-4 mr-1 fill-current" />
-                    Donate
-                </Button>
             </div>
             <div className="flex items-center gap-1">
                 <Button
