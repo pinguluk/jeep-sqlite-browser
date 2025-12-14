@@ -56,7 +56,7 @@ export function Sidebar() {
             </div>
 
             {/* Tables Section */}
-            <div className="flex-1 p-2 flex flex-col overflow-hidden">
+            <div className="flex-1 p-2 flex flex-col overflow-auto">
                 <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground px-2 py-1">
                     <Table2 className="w-3.5 h-3.5" />
                     <span>Tables</span>
@@ -77,7 +77,7 @@ export function Sidebar() {
                                 )}
                             >
                                 <Table2 className="w-4 h-4 shrink-0" />
-                                <span className="flex-1 truncate">{table.name}</span>
+                                <span className="flex-1 truncate max-w-[200px]">{table.name}</span>
                                 <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-full font-medium">
                                     {table.rowCount.toLocaleString()}
                                 </span>

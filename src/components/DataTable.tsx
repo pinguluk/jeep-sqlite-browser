@@ -101,10 +101,10 @@ export function DataTable() {
     }
 
     return (
-        <div className="flex flex-col h-full">
-            {/* Top Pagination */}
+        <div className="flex flex-col h-full overflow-hidden">
+            {/* Top Pagination - Fixed */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-between px-2 py-2 border-b">
+                <div className="flex-shrink-0 flex items-center justify-between px-2 py-2 border-b bg-background">
                     <div className="text-sm text-muted-foreground">
                         Showing {((page - 1) * pageSize) + 1}-{Math.min(page * pageSize, tableData.total)} of {tableData.total.toLocaleString()} rows
                     </div>
@@ -131,13 +131,15 @@ export function DataTable() {
                     </div>
                 </div>
             )}
-            <div className="flex-1 overflow-auto rounded-md border">
+
+            {/* Scrollable Table Container */}
+            <div className="flex-1 overflow-auto min-h-0">
                 <Table>
-                    <TableHeader>
+                    <TableHeader className="sticky top-0 z-10">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id} className="bg-muted/50">
+                                    <TableHead key={header.id} className="bg-muted">
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(header.column.columnDef.header, header.getContext())}
@@ -168,11 +170,11 @@ export function DataTable() {
                 </Table>
             </div>
 
-            {/* Pagination */}
+            {/* Bottom Pagination - Fixed */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-between px-2 py-2">
+                <div className="flex-shrink-0 flex items-center justify-between px-2 py-2 border-t bg-background">
                     <div className="text-sm text-muted-foreground">
-                        Showing {((page - 1) * pageSize) + 1}-{Math.min(page * pageSize, tableData.total)} of {tableData.total} rows
+                        Showing {((page - 1) * pageSize) + 1}-{Math.min(page * pageSize, tableData.total)} of {tableData.total.toLocaleString()} rows
                     </div>
                     <div className="flex items-center gap-2">
                         <Button

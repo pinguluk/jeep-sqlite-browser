@@ -79,13 +79,13 @@ function PanelContent() {
         <div className="flex flex-col h-full w-full bg-background text-foreground">
             <Header />
 
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1">
                 <Sidebar />
 
-                <main className="flex-1 flex flex-col overflow-hidden">
+                <main className="flex-1 flex flex-col">
                     <Toolbar />
 
-                    <Tabs defaultValue="data" className="flex-1 flex flex-col overflow-hidden">
+                    <Tabs defaultValue="data" className="flex-1 flex flex-col">
                         <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
                             <TabsTrigger
                                 value="data"
