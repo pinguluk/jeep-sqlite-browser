@@ -4,7 +4,7 @@
  */
 
 import initSqlJs, { Database, SqlJsStatic } from 'sql.js';
-import type { TableInfo, ColumnInfo, TableData, QueryResult } from '../types';
+import type { TableInfo, ColumnInfo, TableData, QueryResult } from '../types/types';
 
 export class DatabaseHandler {
     private db: Database | null = null;

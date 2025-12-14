@@ -3,7 +3,7 @@
  * Injected into pages to access IndexedDB and extract Jeep SQLite databases
  */
 
-import type { ContentMessage, MessageResponse } from '../types';
+import type { ContentMessage, MessageResponse } from '../types/types';
 
 export default defineContentScript({
   matches: ['<all_urls>'],
@@ -238,16 +238,16 @@ export default defineContentScript({
 
               // Normalize data to ArrayBuffer
               if (data instanceof Uint8Array) {
-                buffer = data.buffer;
+                buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength) as ArrayBuffer;
               } else if (data instanceof ArrayBuffer) {
                 buffer = data;
               } else if (data && data.buffer instanceof ArrayBuffer) {
-                buffer = data.buffer;
+                buffer = data.buffer.slice(0) as ArrayBuffer;
               } else if (data && data.data) {
                 if (data.data instanceof Uint8Array) {
-                  buffer = data.data.buffer;
+                  buffer = data.data.buffer.slice(data.data.byteOffset, data.data.byteOffset + data.data.byteLength) as ArrayBuffer;
                 } else if (Array.isArray(data.data)) {
-                  buffer = new Uint8Array(data.data).buffer;
+                  buffer = new Uint8Array(data.data).buffer as ArrayBuffer;
                 }
               }
 

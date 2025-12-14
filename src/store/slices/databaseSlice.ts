@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import type { DatabaseInfo } from '../../types';
+import type { DatabaseInfo } from '../../types/types';
 import { sendToContentScript, getInspectedTabId } from '../../utils/devtools-comm';
 import { dbHandler } from '../../utils/database-handler';
 import { computeHash, formatBytes } from '../../utils/helpers';

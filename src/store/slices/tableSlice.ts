@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import type { TableInfo, TableData, ColumnInfo } from '../../types';
+import type { TableInfo, TableData, ColumnInfo } from '../../types/types';
 import { dbHandler } from '../../utils/database-handler';
 
 interface TableState {

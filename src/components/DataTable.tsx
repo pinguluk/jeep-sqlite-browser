@@ -104,7 +104,7 @@ export function DataTable() {
         <div className="flex flex-col h-full overflow-hidden">
             {/* Top Pagination - Fixed */}
             {totalPages > 1 && (
-                <div className="flex-shrink-0 flex items-center justify-between px-2 py-2 border-b bg-background">
+                <div className="shrink-0 flex items-center justify-between px-2 py-2 border-b bg-background">
                     <div className="text-sm text-muted-foreground">
                         Showing {((page - 1) * pageSize) + 1}-{Math.min(page * pageSize, tableData.total)} of {tableData.total.toLocaleString()} rows
                     </div>
@@ -172,7 +172,7 @@ export function DataTable() {
 
             {/* Bottom Pagination - Fixed */}
             {totalPages > 1 && (
-                <div className="flex-shrink-0 flex items-center justify-between px-2 py-2 border-t bg-background">
+                <div className="shrink-0 flex items-center justify-between px-2 py-2 border-t bg-background">
                     <div className="text-sm text-muted-foreground">
                         Showing {((page - 1) * pageSize) + 1}-{Math.min(page * pageSize, tableData.total)} of {tableData.total.toLocaleString()} rows
                     </div>
