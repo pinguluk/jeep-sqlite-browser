@@ -103,24 +103,43 @@ pnpm build
 
 ```
 src/
-├── types.ts                     # TypeScript interfaces
+├── types.ts                        # TypeScript interfaces
+├── lib/
+│   └── utils.ts                    # Utility functions (cn, etc.)
 ├── utils/
-│   ├── helpers.ts              # Utility functions
-│   ├── settings.ts             # Settings persistence
-│   ├── database-handler.ts     # SQL.js wrapper
-│   └── devtools-comm.ts        # DevTools communication
-├── store/                      # Redux store
-│   ├── store.ts
-│   ├── hooks.ts
-│   └── slices/                 # Redux slices
-├── components/                 # React components
-│   ├── ui/                     # shadcn/ui components
-│   └── ...                     # App components
+│   ├── helpers.ts                  # Utility functions
+│   ├── settings.ts                 # Settings persistence (localStorage)
+│   ├── database-handler.ts         # SQL.js wrapper
+│   └── devtools-comm.ts            # DevTools communication
+├── store/                          # Redux store
+│   ├── store.ts                    # Store configuration
+│   ├── hooks.ts                    # Typed dispatch/selector hooks
+│   └── slices/
+│       ├── databaseSlice.ts        # Database state
+│       ├── tableSlice.ts           # Table state
+│       ├── querySlice.ts           # SQL query state
+│       └── uiSlice.ts              # UI state
+├── components/
+│   ├── ui/                         # shadcn/ui components
+│   ├── Header.tsx                  # App header with controls
+│   ├── Sidebar.tsx                 # Database/table browser
+│   ├── Toolbar.tsx                 # Table actions toolbar
+│   ├── DataTable.tsx               # Data grid with pagination
+│   ├── StructureTab.tsx            # Table structure view
+│   ├── QueryTab.tsx                # SQL query editor
+│   ├── StatusBar.tsx               # Status information
+│   ├── InsertEditModal.tsx         # Insert/edit row modal
+│   └── DeleteConfirmModal.tsx      # Delete confirmation
+├── styles/
+│   └── globals.css                 # Global styles & Tailwind
 └── entrypoints/
-    ├── content.ts              # Content script
-    ├── background.ts           # Background worker
-    ├── devtools.ts             # DevTools entry
-    └── devtools-panel/         # React DevTools panel
+    ├── content.ts                  # Content script (page injection)
+    ├── background.ts               # Background service worker
+    ├── devtools.ts                 # DevTools panel registration
+    └── devtools-panel/             # React DevTools panel
+        ├── index.html
+        ├── main.tsx
+        └── PanelApp.tsx
 ```
 
 ## Support
