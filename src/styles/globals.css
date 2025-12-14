@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+/* Custom DevTools theme colors */
+@theme {
+    --color-devtools-bg-primary: #202124;
+    --color-devtools-bg-secondary: #292a2d;
+    --color-devtools-bg-tertiary: #35363a;
+    --color-devtools-bg-hover: #3c4043;
+    --color-devtools-bg-active: #4a4d51;
+
+    --color-devtools-text-primary: #e8eaed;
+    --color-devtools-text-secondary: #9aa0a6;
+    --color-devtools-text-muted: #5f6368;
+    --color-devtools-text-accent: #8ab4f8;
+
+    --color-devtools-border: #3c4043;
+
+    --color-devtools-accent-blue: #8ab4f8;
+    --color-devtools-accent-green: #81c995;
+    --color-devtools-accent-yellow: #fdd663;
+    --color-devtools-accent-red: #f28b82;
+    --color-devtools-accent-purple: #c58af9;
+    --color-devtools-accent-cyan: #78d9ec;
+}
+
+/* Custom scrollbars to match DevTools */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #5f6368 #202124;
+}
+
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: #202124;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #5f6368;
+    border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: #9aa0a6;
+}
+
+/* Base styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: '.SFNSDisplay-Regular', 'Helvetica Neue', 'Lucida Grande', sans-serif;
+    font-size: 11px;
+    background: var(--color-devtools-bg-primary);
+    color: var(--color-devtools-text-primary);
+    overflow: hidden;
+    width: 100%;
+    height: 100vh;
+}
+
+#root {
+    width: 100%;
+    height: 100%;
+}
