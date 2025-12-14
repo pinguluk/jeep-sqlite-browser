@@ -62,18 +62,32 @@ const PanelApp: React.FC = () => {
             const response = await sendToContentScript({ action: 'scan', tabId: inspectedTabId });
 
             if (response?.success && response.data) {
-                // Flatten the database structure
+                // Flatten the database structure and get actual keys
                 const dbList: DatabaseInfo[] = [];
-                response.data.forEach((dbInfo: any) => {
-                    dbInfo.stores.forEach((storeName: string) => {
-                        // Mock keys - in reality we'd need to query them
-                        dbList.push({
+
+                for (const dbInfo of response.data) {
+                    for (const storeName of dbInfo.stores) {
+                        // Get actual keys from the store
+                        const keysResponse = await sendToContentScript({
+                            action: 'listKeys',
+                            tabId: inspectedTabId,
                             idbName: dbInfo.idbName,
-                            storeName,
-                            key: 'default',
+                            storeName: storeName,
                         });
-                    });
-                });
+
+                        if (keysResponse?.success && keysResponse.data) {
+                            // Add each key as a separate database entry
+                            for (const key of keysResponse.data) {
+                                dbList.push({
+                                    idbName: dbInfo.idbName,
+                                    storeName,
+                                    key: key,
+                                });
+                            }
+                        }
+                    }
+                }
+
                 setDatabases(dbList);
                 setStatus(`Found ${dbList.length} database(s)`);
             } else {
