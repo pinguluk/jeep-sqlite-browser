@@ -2,8 +2,8 @@ import { RefreshCw, Plus, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { loadDatabase, setAutoRefresh } from '@/store/slices/databaseSlice';
-import { loadTablesAsync, refreshTablesAsync } from '@/store/slices/tableSlice';
+import { reloadDatabaseData, setAutoRefresh } from '@/store/slices/databaseSlice';
+import { refreshTablesAsync } from '@/store/slices/tableSlice';
 import { openInsertModal, setStatus } from '@/store/slices/uiSlice';
 import { downloadFile } from '@/utils/helpers';
 import { dbHandler } from '@/utils/database-handler';
@@ -13,15 +13,18 @@ export function Toolbar() {
     const { currentDb, staleWarning, autoRefresh } = useAppSelector((state) => state.database);
     const { currentTable, tableData, tableStructure } = useAppSelector((state) => state.table);
 
-    const handleReload = async () => {
-        if (currentDb) {
-            await dispatch(loadDatabase(currentDb));
-            dispatch(loadTablesAsync());
-        }
+    // Stale reload - preserves table selection
+    const handleStaleReload = async () => {
+        await dispatch(reloadDatabaseData());
+        dispatch(refreshTablesAsync());
+        dispatch(setStatus('Data reloaded'));
     };
 
-    const handleRefreshData = () => {
+    // Manual refresh - just reload table data
+    const handleRefreshData = async () => {
+        await dispatch(reloadDatabaseData());
         dispatch(refreshTablesAsync());
+        dispatch(setStatus('Data refreshed'));
     };
 
     const handleInsert = () => {
@@ -66,7 +69,7 @@ export function Toolbar() {
                 )}
                 {staleWarning && (
                     <span
-                        onClick={handleReload}
+                        onClick={handleStaleReload}
                         className="text-yellow-500 cursor-pointer text-xs font-medium animate-pulse"
                         title="Database has changed, click to refresh"
                     >

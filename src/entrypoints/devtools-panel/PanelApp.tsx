@@ -2,8 +2,8 @@ import { useEffect, useRef, useCallback } from 'react';
 import { Provider } from 'react-redux';
 import { store } from '@/store/store';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { scanDatabases, checkForChanges, loadDatabase } from '@/store/slices/databaseSlice';
-import { loadTablesAsync, refreshTablesAsync } from '@/store/slices/tableSlice';
+import { scanDatabases, checkForChanges, reloadDatabaseData } from '@/store/slices/databaseSlice';
+import { refreshTablesAsync } from '@/store/slices/tableSlice';
 import { dbHandler } from '@/utils/database-handler';
 import { setStatus } from '@/store/slices/uiSlice';
 
@@ -22,6 +22,11 @@ function PanelContent() {
     const dispatch = useAppDispatch();
     const { currentDb, autoRefresh } = useAppSelector((state) => state.database);
     const watchTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Initialize on mount - add dark class by default for DevTools
+    useEffect(() => {
+        document.documentElement.classList.add('dark');
+    }, []);
 
     // Initialize on mount
     useEffect(() => {
@@ -45,9 +50,9 @@ function PanelContent() {
         const result = await dispatch(checkForChanges());
         if (result.payload && (result.payload as any).changed) {
             if (autoRefresh) {
-                // Auto reload if enabled
-                await dispatch(loadDatabase(currentDb));
-                dispatch(loadTablesAsync());
+                // Auto reload - preserves table selection
+                await dispatch(reloadDatabaseData());
+                dispatch(refreshTablesAsync());
             }
         }
     }, [currentDb, autoRefresh, dispatch]);

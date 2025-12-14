@@ -83,6 +83,34 @@ export const loadDatabase = createAsyncThunk(
     }
 );
 
+// Reload database data without resetting state (for stale refresh)
+export const reloadDatabaseData = createAsyncThunk(
+    'database/reloadData',
+    async (_, { getState }) => {
+        const state = getState() as { database: DatabaseState };
+        const { currentDb } = state.database;
+
+        if (!currentDb) throw new Error('No database selected');
+
+        const inspectedTabId = getInspectedTabId();
+        const response = await sendToContentScript({
+            action: 'extract',
+            tabId: inspectedTabId,
+            ...currentDb,
+        });
+
+        if (!response?.success || !response.data) {
+            throw new Error('Failed to reload database');
+        }
+
+        const data = new Uint8Array(response.data);
+        dbHandler.loadDatabase(currentDb.key, data);
+        const hash = await computeHash(data);
+
+        return { hash, dbInfo: `${currentDb.key} (${formatBytes(data.length)})` };
+    }
+);
+
 export const checkForChanges = createAsyncThunk(
     'database/checkChanges',
     async (_, { getState }) => {
@@ -161,6 +189,11 @@ const databaseSlice = createSlice({
             .addCase(loadDatabase.fulfilled, (state, action) => {
                 state.currentDb = action.payload.db;
                 state.currentDbData = action.payload.data;
+                state.currentHash = action.payload.hash;
+                state.dbInfo = action.payload.dbInfo;
+                state.staleWarning = false;
+            })
+            .addCase(reloadDatabaseData.fulfilled, (state, action) => {
                 state.currentHash = action.payload.hash;
                 state.dbInfo = action.payload.dbInfo;
                 state.staleWarning = false;
