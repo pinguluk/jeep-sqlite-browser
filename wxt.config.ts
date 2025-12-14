@@ -1,12 +1,18 @@
 import { defineConfig } from 'wxt';
 import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   srcDir: 'src',
-  modules: ['@wxt-dev/auto-icons', '@wxt-dev/module-react',],
+  modules: ['@wxt-dev/auto-icons', '@wxt-dev/module-react'],
   vite: () => ({
     plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
+    },
   }),
   manifest: {
     name: 'Jeep SQLite Browser',
@@ -15,6 +21,7 @@ export default defineConfig({
     permissions: ['activeTab', 'storage'],
   },
   webExt: {
-    startUrls: ["http://localhost:5173/tabs/home"],
+    startUrls: ['http://localhost:5173/tabs/home'],
   },
 });
+
