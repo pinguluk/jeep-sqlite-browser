@@ -4,25 +4,49 @@ import { Button } from '@/components/ui/button';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { scanDatabases } from '@/store/slices/databaseSlice';
 
+const STORAGE_KEY = 'jeep-sqlite-browser-settings';
+
+interface Settings {
+    darkMode: boolean;
+}
+
+function loadSettings(): Settings {
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (e) {
+        console.log('Failed to load settings:', e);
+    }
+    return { darkMode: true }; // Default to dark mode
+}
+
+function saveSettings(settings: Settings): void {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    } catch (e) {
+        console.log('Failed to save settings:', e);
+    }
+}
+
 export function Header() {
     const dispatch = useAppDispatch();
     const { tables } = useAppSelector((state) => state.table);
-    const [isDark, setIsDark] = useState(true);
+    const [isDark, setIsDark] = useState(() => loadSettings().darkMode);
 
-    // Initialize dark mode
+    // Apply dark mode on mount and when it changes
     useEffect(() => {
-        const isDarkMode = document.documentElement.classList.contains('dark');
-        setIsDark(isDarkMode);
-    }, []);
-
-    const toggleDarkMode = () => {
-        const newIsDark = !isDark;
-        setIsDark(newIsDark);
-        if (newIsDark) {
+        if (isDark) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
         }
+        saveSettings({ darkMode: isDark });
+    }, [isDark]);
+
+    const toggleDarkMode = () => {
+        setIsDark(!isDark);
     };
 
     // Calculate total rows across all tables

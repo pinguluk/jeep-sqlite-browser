@@ -23,11 +23,6 @@ function PanelContent() {
     const { currentDb, autoRefresh } = useAppSelector((state) => state.database);
     const watchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Initialize on mount - add dark class by default for DevTools
-    useEffect(() => {
-        document.documentElement.classList.add('dark');
-    }, []);
-
     // Initialize on mount
     useEffect(() => {
         const init = async () => {
