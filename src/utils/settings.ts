@@ -26,7 +26,7 @@ function detectBrowserDarkMode(): boolean {
 function getDefaultSettings(): Settings {
     return {
         darkMode: detectBrowserDarkMode(),
-        autoRefresh: false,
+        autoRefresh: true,
     };
 }
 

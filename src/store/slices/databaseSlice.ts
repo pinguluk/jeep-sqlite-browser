@@ -22,7 +22,7 @@ const initialState: DatabaseState = {
     currentHash: null,
     dbInfo: '',
     staleWarning: false,
-    autoRefresh: false,
+    autoRefresh: true,
     isReloading: false,
 };
 
