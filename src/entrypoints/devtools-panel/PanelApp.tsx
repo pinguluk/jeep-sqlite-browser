@@ -23,6 +23,11 @@ function PanelContent() {
     const { currentDb, autoRefresh } = useAppSelector((state) => state.database);
     const watchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+    // Initialize on mount - add dark class by default for DevTools
+    useEffect(() => {
+        document.documentElement.classList.add('dark');
+    }, []);
+
     // Initialize on mount
     useEffect(() => {
         const init = async () => {
@@ -74,13 +79,13 @@ function PanelContent() {
         <div className="flex flex-col h-full w-full bg-background text-foreground">
             <Header />
 
-            <div className="flex flex-1">
+            <div className="flex flex-1 overflow-auto">
                 <Sidebar />
 
-                <main className="flex-1 flex flex-col">
+                <main className="flex-1 flex flex-col overflow-auto">
                     <Toolbar />
 
-                    <Tabs defaultValue="data" className="flex-1 flex flex-col">
+                    <Tabs defaultValue="data" className="flex-1 flex flex-col overflow-auto">
                         <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
                             <TabsTrigger
                                 value="data"
