@@ -68,7 +68,7 @@ function PanelContent() {
 
         if (currentDb) {
             // Poll every 500ms for faster detection
-            watchTimerRef.current = setInterval(checkChanges, 500);
+            watchTimerRef.current = setInterval(checkChanges, 100);
         }
 
         return () => {
