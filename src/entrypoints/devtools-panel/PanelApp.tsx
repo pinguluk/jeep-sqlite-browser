@@ -2,10 +2,11 @@ import { useEffect, useRef, useCallback } from 'react';
 import { Provider } from 'react-redux';
 import { store } from '@/store/store';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { scanDatabases, checkForChanges, reloadDatabaseData } from '@/store/slices/databaseSlice';
+import { scanDatabases, checkForChanges, reloadDatabaseData, setAutoRefresh } from '@/store/slices/databaseSlice';
 import { refreshTablesAsync } from '@/store/slices/tableSlice';
 import { dbHandler } from '@/utils/database-handler';
 import { setStatus } from '@/store/slices/uiSlice';
+import { loadSettings, applyDarkMode } from '@/utils/settings';
 
 import { Header } from '@/components/Header';
 import { Sidebar } from '@/components/Sidebar';
@@ -23,10 +24,12 @@ function PanelContent() {
     const { currentDb, autoRefresh } = useAppSelector((state) => state.database);
     const watchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Initialize on mount - add dark class by default for DevTools
+    // Load settings and apply dark mode on mount
     useEffect(() => {
-        document.documentElement.classList.add('dark');
-    }, []);
+        const settings = loadSettings();
+        applyDarkMode(settings.darkMode);
+        dispatch(setAutoRefresh(settings.autoRefresh));
+    }, [dispatch]);
 
     // Initialize on mount
     useEffect(() => {

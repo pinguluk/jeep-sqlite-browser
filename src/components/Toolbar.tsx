@@ -7,6 +7,7 @@ import { refreshTablesAsync } from '@/store/slices/tableSlice';
 import { openInsertModal, setStatus } from '@/store/slices/uiSlice';
 import { downloadFile } from '@/utils/helpers';
 import { dbHandler } from '@/utils/database-handler';
+import { saveSettings } from '@/utils/settings';
 
 export function Toolbar() {
     const dispatch = useAppDispatch();
@@ -58,6 +59,12 @@ export function Toolbar() {
         }
     };
 
+    const handleAutoRefreshChange = (checked: boolean | 'indeterminate') => {
+        const isEnabled = checked === true;
+        dispatch(setAutoRefresh(isEnabled));
+        saveSettings({ autoRefresh: isEnabled });
+    };
+
     return (
         <div className="h-10 bg-muted/30 border-b flex items-center justify-between px-3">
             <div className="flex items-center gap-3">
@@ -86,7 +93,7 @@ export function Toolbar() {
                     <Checkbox
                         id="auto-refresh"
                         checked={autoRefresh}
-                        onCheckedChange={(checked) => dispatch(setAutoRefresh(checked === true))}
+                        onCheckedChange={handleAutoRefreshChange}
                         disabled={!currentDb}
                     />
                     <label htmlFor="auto-refresh" className="text-xs cursor-pointer">

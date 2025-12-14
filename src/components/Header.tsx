@@ -3,45 +3,16 @@ import { Database, RefreshCw, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { scanDatabases } from '@/store/slices/databaseSlice';
-
-const STORAGE_KEY = 'jeep-sqlite-browser-settings';
-
-interface Settings {
-    darkMode: boolean;
-}
-
-function loadSettings(): Settings {
-    try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            return JSON.parse(stored);
-        }
-    } catch (e) {
-        console.log('Failed to load settings:', e);
-    }
-    return { darkMode: true }; // Default to dark mode
-}
-
-function saveSettings(settings: Settings): void {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    } catch (e) {
-        console.log('Failed to save settings:', e);
-    }
-}
+import { loadSettings, saveSettings, applyDarkMode } from '@/utils/settings';
 
 export function Header() {
     const dispatch = useAppDispatch();
     const { tables } = useAppSelector((state) => state.table);
     const [isDark, setIsDark] = useState(() => loadSettings().darkMode);
 
-    // Apply dark mode on mount and when it changes
+    // Apply dark mode when it changes
     useEffect(() => {
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        applyDarkMode(isDark);
         saveSettings({ darkMode: isDark });
     }, [isDark]);
 
