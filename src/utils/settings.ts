@@ -9,21 +9,40 @@ export interface Settings {
     autoRefresh: boolean;
 }
 
-const defaultSettings: Settings = {
-    darkMode: true,
-    autoRefresh: false,
-};
+/**
+ * Detect browser/OS dark mode preference
+ */
+function detectBrowserDarkMode(): boolean {
+    try {
+        return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+    } catch {
+        return false; // Default to light mode if detection fails
+    }
+}
+
+/**
+ * Get default settings (browser preference or light mode fallback)
+ */
+function getDefaultSettings(): Settings {
+    return {
+        darkMode: detectBrowserDarkMode(),
+        autoRefresh: false,
+    };
+}
 
 export function loadSettings(): Settings {
     try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
-            return { ...defaultSettings, ...JSON.parse(stored) };
+            const parsed = JSON.parse(stored);
+            // Merge with defaults for any missing keys
+            return { ...getDefaultSettings(), ...parsed };
         }
     } catch (e) {
         console.log('Failed to load settings:', e);
     }
-    return { ...defaultSettings };
+    // No saved preference - use browser theme or light mode fallback
+    return getDefaultSettings();
 }
 
 export function saveSettings(settings: Partial<Settings>): void {
