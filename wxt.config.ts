@@ -18,7 +18,7 @@ export default defineConfig({
     name: 'Jeep SQLite Browser',
     version: '1.0.0',
     description: 'Browse and manage Jeep SQLite databases stored in IndexedDB',
-    permissions: ['activeTab', 'storage'],
+    permissions: ['activeTab', 'storage', 'scripting'],
     content_security_policy: {
       extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
     },

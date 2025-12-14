@@ -70,7 +70,11 @@ export interface GetHashMessage {
     key: string;
 }
 
-export type ContentMessage = ScanMessage | ListKeysMessage | ExtractMessage | SaveMessage | GetHashMessage;
+export interface PingMessage {
+    action: 'ping';
+}
+
+export type ContentMessage = ScanMessage | ListKeysMessage | ExtractMessage | SaveMessage | GetHashMessage | PingMessage;
 
 export interface MessageResponse<T = any> {
     success: boolean;

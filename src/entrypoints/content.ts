@@ -282,6 +282,12 @@ export default defineContentScript({
       (async () => {
         try {
           switch (message.action) {
+            case 'ping': {
+              // Health check - content script is loaded
+              sendResponse({ success: true, data: 'pong' } as MessageResponse);
+              break;
+            }
+
             case 'scan': {
               const databases = await scanForDatabases();
               sendResponse({ success: true, data: databases } as MessageResponse);
