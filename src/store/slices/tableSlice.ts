@@ -9,6 +9,7 @@ interface TableState {
     tableStructure: ColumnInfo[];
     page: number;
     pageSize: number;
+    isLoadingTables: boolean;
 }
 
 const initialState: TableState = {
@@ -18,6 +19,7 @@ const initialState: TableState = {
     tableStructure: [],
     page: 1,
     pageSize: 100,
+    isLoadingTables: false,
 };
 
 // Async thunks for proper state updates
@@ -84,12 +86,19 @@ const tableSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            .addCase(loadTablesAsync.pending, (state) => {
+                state.isLoadingTables = true;
+            })
             .addCase(loadTablesAsync.fulfilled, (state, action) => {
                 state.tables = action.payload;
                 state.currentTable = null;
                 state.tableData = null;
                 state.tableStructure = [];
                 state.page = 1;
+                state.isLoadingTables = false;
+            })
+            .addCase(loadTablesAsync.rejected, (state) => {
+                state.isLoadingTables = false;
             })
             .addCase(selectTableAsync.fulfilled, (state, action) => {
                 state.currentTable = action.payload.tableName;

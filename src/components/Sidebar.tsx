@@ -1,4 +1,4 @@
-import { Database, Table2 } from 'lucide-react';
+import { Database, Table2, Loader2 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { loadDatabase } from '@/store/slices/databaseSlice';
 import { selectTableAsync, loadTablesAsync } from '@/store/slices/tableSlice';
@@ -8,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 export function Sidebar() {
     const dispatch = useAppDispatch();
     const { databases, currentDb } = useAppSelector((state) => state.database);
-    const { tables, currentTable } = useAppSelector((state) => state.table);
+    const { tables, currentTable, isLoadingTables } = useAppSelector((state) => state.table);
     const { loading } = useAppSelector((state) => state.ui);
 
     const handleSelectDatabase = async (db: typeof databases[0]) => {
@@ -69,9 +69,16 @@ export function Sidebar() {
                 <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground px-2 py-1">
                     <Table2 className="w-3.5 h-3.5" />
                     <span>Tables</span>
+                    {isLoadingTables && (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                    )}
                 </div>
                 <ScrollArea className="flex-1">
-                    {tables.length === 0 ? (
+                    {isLoadingTables ? (
+                        <div className="flex items-center justify-center py-4">
+                            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                        </div>
+                    ) : tables.length === 0 ? (
                         <div className="text-xs text-muted-foreground px-2 py-1">Select a database</div>
                     ) : (
                         tables.map((table) => (
