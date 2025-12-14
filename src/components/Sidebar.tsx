@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Database, Table2, Loader2 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { loadDatabase } from '@/store/slices/databaseSlice';
@@ -10,10 +11,16 @@ export function Sidebar() {
     const { databases, currentDb } = useAppSelector((state) => state.database);
     const { tables, currentTable, isLoadingTables } = useAppSelector((state) => state.table);
     const { loading } = useAppSelector((state) => state.ui);
+    const [isConnecting, setIsConnecting] = useState(false);
 
     const handleSelectDatabase = async (db: typeof databases[0]) => {
+        // Show loading spinner first, then fetch after a small delay
+        setIsConnecting(true);
+        await new Promise(resolve => setTimeout(resolve, 10));
+        
         await dispatch(loadDatabase(db));
         dispatch(loadTablesAsync());
+        setIsConnecting(false);
     };
 
     const handleSelectTable = (tableName: string) => {
@@ -74,7 +81,7 @@ export function Sidebar() {
                     )}
                 </div>
                 <ScrollArea className="flex-1">
-                    {isLoadingTables ? (
+                    {(isLoadingTables || loading || isConnecting) ? (
                         <div className="flex items-center justify-center py-4">
                             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
                         </div>

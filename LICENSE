@@ -1,0 +1,85 @@
+Custom Attribution + NonCommercial + Substantial-Changes-Only Redistribution License
+Version 1.0
+
+Copyright (c) 2025 pingluluk
+
+This license applies to the source code and other contents of this repository (the "Software"),
+except where a file or dependency clearly states different terms.
+
+1. Definitions
+- "You" means any person or entity exercising rights under this license.
+- "Redistribute" means to publish, upload, share, distribute, or make available to others,
+  by any means, including hosting on a website, repo, store, or file sharing service.
+- "Modified Version" means the Software with any changes.
+- "Substantial Changes" are changes that meet the requirements in section 3.
+
+2. Permissions
+You may:
+(a) Use the Software for personal, educational, and research purposes.
+(b) Fork the repository and modify the Software.
+(c) Share your changes with the original project via pull request.
+
+3. Substantial Changes requirement (redistribution gate)
+You may Redistribute a Modified Version only if it includes Substantial Changes.
+
+"Substantial Changes" means the Modified Version does at least one of the following:
+(A) Fixes a real functional bug (not just formatting or comments); OR
+(B) Adds a new user-visible feature (a behavior change a user can notice or use); OR
+(C) Makes a meaningful security or privacy improvement (for example: reduces permissions,
+    removes data collection, fixes a security bug, or mitigates a vulnerability).
+
+The following are NOT Substantial Changes by themselves:
+- renaming the project, changing branding, icons, donate link or extension listing text
+- README-only or documentation-only edits
+- formatting, linting, refactoring with no behavior change
+- changing build scripts or configs without changing behavior
+
+4. No redistribution of unmodified copies
+You may NOT Redistribute unmodified copies of the Software.
+
+5. Attribution (credit required)
+Any permitted Redistribution must include clear credit to the original author and project.
+At minimum, you must:
+- keep the original copyright notice
+- state: "Original project by pingluluk"
+- include a link to the original repository in a prominent place (README and/or about page)
+
+6. ShareAlike (same license on derivatives)
+If you Redistribute a Modified Version, you must license your Modified Version under this
+same license text, without removing or weakening any restrictions.
+
+7. NonCommercial only
+You may NOT use, Redistribute, or make the Software available for Commercial purposes.
+
+"Commercial purposes" include, but are not limited to:
+- selling the Software or access to it
+- subscriptions, paywalls, paid feature unlocks
+- distributing it as part of a paid product or paid service
+- monetizing it primarily through ads, affiliate revenue, sponsorship placements, or
+  other revenue tied to distribution or usage of the Software
+
+8. Extension stores and marketplaces (no publishing without permission)
+Regardless of Substantial Changes, you may NOT publish or distribute this extension (or a
+Modified Version) on any browser extension store or marketplace without prior written
+permission from the original author. This includes (examples): Chrome Web Store, Mozilla AMO,
+Microsoft Edge Add-ons, Opera Add-ons, and similar platforms.
+
+9. Required notice of changes
+If you Redistribute a Modified Version, you must:
+- include a CHANGELOG describing the Substantial Changes
+- clearly state that your version is modified and not an official release of the original
+
+10. Third party dependencies
+Third party code included by dependency may be licensed under its own terms. Those terms
+apply to the third party code and do not grant you extra rights to this Software.
+
+11. Termination
+Any violation of this license automatically terminates your rights. If your rights terminate,
+you must stop all use and Redistribution of the Software and delete copies you control.
+
+12. No warranty and limitation of liability
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

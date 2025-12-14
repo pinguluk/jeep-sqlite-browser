@@ -80,13 +80,13 @@ pnpm compile
 ## Technology Stack
 
 - **Framework**: [WXT](https://wxt.dev/) - Modern extension framework
-- **UI**: React 19 with TypeScript
-- **State**: Redux Toolkit
+- **UI**: [React 19](https://reactjs.org/) with [TypeScript](https://www.typescriptlang.org/)
+- **State**: [Redux Toolkit](https://redux-toolkit.js.org/)
 - **Components**: [shadcn/ui](https://ui.shadcn.com/)
-- **Tables**: TanStack React Table
+- **Tables**: [TanStack React Table](https://tanstack.com/table/v8)
 - **Database**: [SQL.js](https://github.com/sql-js/sql.js/) - SQLite compiled to WebAssembly
-- **Styling**: Tailwind CSS v4
-- **Build Tool**: Vite (via WXT)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Build Tool**: [Vite](https://vite.dev/) (via WXT)
 
 ## Project Structure
 
@@ -118,7 +118,7 @@ If you find this extension useful, consider [supporting on Ko-fi](https://ko-fi.
 
 ## License
 
-This project is licensed under a Custom Attribution + NonCommercial license. See [LICENSE](LICENSE) for details.
+This project is licensed under a Custom Attribution + NonCommercial + Substantial-Changes-Only Redistribution License. See [LICENSE](LICENSE) for details.
 
 **Key points:**
 
@@ -131,5 +131,3 @@ This project is licensed under a Custom Attribution + NonCommercial license. See
 ## Credits
 
 Original project by [pinguluk](https://github.com/pinguluk).
-
-Built with modern TypeScript + React architecture.
