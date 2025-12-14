@@ -20,6 +20,11 @@ A Chrome DevTools extension for browsing and managing Jeep SQLite databases stor
 
 ## Installation
 
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) 18+
+- Package manager: [pnpm](https://pnpm.io/) (recommended), [yarn](https://yarnpkg.com/), or [npm](https://www.npmjs.com/)
+
 ### From Source
 
 1. **Clone the repository:**
@@ -49,6 +54,18 @@ A Chrome DevTools extension for browsing and managing Jeep SQLite databases stor
 
 ## Development
 
+### Available Commands
+
+| Command              | Description                                 |
+| -------------------- | ------------------------------------------- |
+| `pnpm dev`           | Start development with hot reload (Chrome)  |
+| `pnpm dev:firefox`   | Start development with hot reload (Firefox) |
+| `pnpm build`         | Build for production (Chrome)               |
+| `pnpm build:firefox` | Build for production (Firefox)              |
+| `pnpm zip`           | Build and create zip package (Chrome)       |
+| `pnpm zip:firefox`   | Build and create zip package (Firefox)      |
+| `pnpm compile`       | Run TypeScript type checking                |
+
 ### Development Mode
 
 Run with hot reload:
@@ -61,12 +78,6 @@ pnpm dev
 
 ```bash
 pnpm build
-```
-
-### TypeScript Check
-
-```bash
-pnpm compile
 ```
 
 ## Usage

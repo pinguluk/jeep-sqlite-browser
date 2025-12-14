@@ -23,8 +23,4 @@ export default defineConfig({
       extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
     },
   },
-  webExt: {
-    startUrls: ['http://localhost:5173/tabs/home'],
-  },
 });
-
