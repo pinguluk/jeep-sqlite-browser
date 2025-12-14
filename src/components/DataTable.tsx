@@ -102,6 +102,35 @@ export function DataTable() {
 
     return (
         <div className="flex flex-col h-full">
+            {/* Top Pagination */}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-between px-2 py-2 border-b">
+                    <div className="text-sm text-muted-foreground">
+                        Showing {((page - 1) * pageSize) + 1}-{Math.min(page * pageSize, tableData.total)} of {tableData.total.toLocaleString()} rows
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => dispatch(setPageAsync(Math.max(1, page - 1)))}
+                            disabled={page <= 1}
+                        >
+                            Previous
+                        </Button>
+                        <span className="text-sm">
+                            Page {page} of {totalPages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => dispatch(setPageAsync(Math.min(totalPages, page + 1)))}
+                            disabled={page >= totalPages}
+                        >
+                            Next
+                        </Button>
+                    </div>
+                </div>
+            )}
             <div className="flex-1 overflow-auto rounded-md border">
                 <Table>
                     <TableHeader>
