@@ -20,6 +20,10 @@ export function Sidebar() {
         dispatch(selectTableAsync(tableName));
     };
 
+    
+    // Calculate total rows across all tables
+    const totalRows = tables.reduce((sum, t) => sum + t.rowCount, 0);
+
     return (
         <aside className="w-max-[2rem] bg-sidebar border-r flex flex-col overflow-hidden">
             {/* Databases Section */}
@@ -47,7 +51,12 @@ export function Sidebar() {
                             >
                                 <Database className="w-4 h-4 shrink-0" />
                                 <span className="truncate" title={db.key}>
-                                    {db.key}
+                                    {db.key}{" "}
+                                    {tables.length > 0 && (
+                                        <span className="text-xs text-muted-foreground font-normal">
+                                            • {tables.length} tables, {totalRows.toLocaleString()} rows
+                                        </span>
+                                    )}
                                 </span>
                             </div>
                         ))

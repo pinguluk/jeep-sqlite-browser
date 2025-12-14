@@ -1,9 +1,19 @@
 import { useState, useEffect } from 'react';
-import { Database, RefreshCw, Moon, Sun } from 'lucide-react';
+import { Database, RefreshCw, Moon, Sun, Info, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { scanDatabases } from '@/store/slices/databaseSlice';
 import { loadSettings, saveSettings, applyDarkMode } from '@/utils/settings';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+
+const VERSION = '1.0.0';
 
 export function Header() {
     const dispatch = useAppDispatch();
@@ -20,21 +30,56 @@ export function Header() {
         setIsDark(!isDark);
     };
 
-    // Calculate total rows across all tables
-    const totalRows = tables.reduce((sum, t) => sum + t.rowCount, 0);
+    const openKoFi = () => {
+        window.open('https://ko-fi.com/pinguluk', '_blank');
+    };
 
     return (
         <header className="h-10 bg-muted/30 border-b flex items-center justify-between px-3">
             <div className="flex items-center gap-2 text-sm font-semibold">
                 <Database className="w-5 h-5 text-primary" />
                 <span>Jeep SQLite Browser</span>
-                {tables.length > 0 && (
-                    <span className="text-xs text-muted-foreground font-normal">
-                        ({tables.length} tables, {totalRows.toLocaleString()} rows)
-                    </span>
-                )}
+                <span className="text-xs text-muted-foreground font-normal">v{VERSION}</span>
+                                {/* About Dialog */}
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" title="About">
+                            <Info className="w-4 h-4" />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                                <Database className="w-5 h-5" />
+                                Jeep SQLite Browser
+                            </DialogTitle>
+                            <DialogDescription className="space-y-3 pt-2">
+                                <p>Version {VERSION}</p>
+                                <p>
+                                    A DevTools extension for browsing and managing Jeep SQLite 
+                                    databases stored in IndexedDB.
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                    Built with React, TypeScript, WXT, shadcn/ui, and Redux Toolkit.
+                                </p>
+                            </DialogDescription>
+                        </DialogHeader>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Ko-fi Donate Button */}
+                <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 text-pink-500 hover:text-pink-600 hover:bg-pink-100 dark:hover:bg-pink-950"
+                    onClick={openKoFi}
+                    title="Support on Ko-fi"
+                >
+                    <Heart className="w-4 h-4 mr-1 fill-current" />
+                    Donate
+                </Button>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
                 <Button
                     variant="ghost"
                     size="icon"
@@ -46,7 +91,7 @@ export function Header() {
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => dispatch(scanDatabases())}>
                     <RefreshCw className="w-3.5 h-3.5 mr-1" />
-                    Reload databases
+                    Reload
                 </Button>
             </div>
         </header>
