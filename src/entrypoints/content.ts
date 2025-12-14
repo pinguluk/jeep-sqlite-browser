@@ -35,19 +35,6 @@ export default defineContentScript({
             }
           }
         }
-
-        // Also check for common Jeep SQLite store patterns
-        const commonNames = ['jeepSqliteStore', 'jeepSQLiteStore'];
-        for (const name of commonNames) {
-          if (!dbs.some((db) => db.name === name)) {
-            try {
-              const foundDbs = await scanDatabase(name);
-              databases.push(...foundDbs);
-            } catch (e) {
-              // Database doesn't exist
-            }
-          }
-        }
       } catch (error) {
         console.error('Failed to scan databases:', error);
       }
