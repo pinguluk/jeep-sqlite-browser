@@ -7,6 +7,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import type { DatabaseInfo, TableInfo, TableData, ColumnInfo, ModalMode } from '../../types';
 import { dbHandler } from '../../utils/database-handler';
 import { escapeHtml, formatBytes, showToast, downloadFile, computeHash } from '../../utils/helpers';
+import { sendToContentScript, getInspectedTabId } from '../../utils/devtools-comm';
 
 const PanelApp: React.FC = () => {
     // State
@@ -55,31 +56,31 @@ const PanelApp: React.FC = () => {
         setLoading(true);
 
         try {
-            const inspectedTabId = chrome.devtools.inspectedWindow.tabId;
+            const inspectedTabId = getInspectedTabId();
 
             // Send message to content script via background
-            chrome.runtime.sendMessage({ action: 'scan', tabId: inspectedTabId }, (response) => {
-                if (response?.success && response.data) {
-                    // Flatten the database structure
-                    const dbList: DatabaseInfo[] = [];
-                    response.data.forEach((dbInfo: any) => {
-                        dbInfo.stores.forEach((storeName: string) => {
-                            // Mock keys - in reality we'd need to query them
-                            dbList.push({
-                                idbName: dbInfo.idbName,
-                                storeName,
-                                key: 'default',
-                            });
+            const response = await sendToContentScript({ action: 'scan', tabId: inspectedTabId });
+
+            if (response?.success && response.data) {
+                // Flatten the database structure
+                const dbList: DatabaseInfo[] = [];
+                response.data.forEach((dbInfo: any) => {
+                    dbInfo.stores.forEach((storeName: string) => {
+                        // Mock keys - in reality we'd need to query them
+                        dbList.push({
+                            idbName: dbInfo.idbName,
+                            storeName,
+                            key: 'default',
                         });
                     });
-                    setDatabases(dbList);
-                    setStatus(`Found ${dbList.length} database(s)`);
-                } else {
-                    setDatabases([]);
-                    setStatus('No databases found');
-                }
-                setLoading(false);
-            });
+                });
+                setDatabases(dbList);
+                setStatus(`Found ${dbList.length} database(s)`);
+            } else {
+                setDatabases([]);
+                setStatus('No databases found');
+            }
+            setLoading(false);
         } catch (error) {
             console.error('Scan error:', error);
             setStatus('Scan failed');
@@ -93,28 +94,25 @@ const PanelApp: React.FC = () => {
         setStatus(`Loading ${db.key}...`);
 
         try {
-            const inspectedTabId = chrome.devtools.inspectedWindow.tabId;
+            const inspectedTabId = getInspectedTabId();
 
-            chrome.runtime.sendMessage(
-                { action: 'extract', tabId: inspectedTabId, ...db },
-                async (response) => {
-                    if (response?.success && response.data) {
-                        const data = new Uint8Array(response.data);
-                        dbHandler.loadDatabase(db.key, data);
-                        setDbInfo(`${db.key} (${formatBytes(data.length)})`);
+            const response = await sendToContentScript({ action: 'extract', tabId: inspectedTabId, ...db });
 
-                        const hash = await computeHash(data);
-                        setCurrentHash(hash);
+            if (response?.success && response.data) {
+                const data = new Uint8Array(response.data);
+                dbHandler.loadDatabase(db.key, data);
+                setDbInfo(`${db.key} (${formatBytes(data.length)})`);
 
-                        const loadedTables = dbHandler.getTables();
-                        setTables(loadedTables);
-                        setStatus('Database loaded');
-                        setStaleWarning(false);
-                    } else {
-                        throw new Error('Failed to extract database');
-                    }
-                }
-            );
+                const hash = await computeHash(data);
+                setCurrentHash(hash);
+
+                const loadedTables = dbHandler.getTables();
+                setTables(loadedTables);
+                setStatus('Database loaded');
+                setStaleWarning(false);
+            } else {
+                throw new Error('Failed to extract database');
+            }
         } catch (error) {
             setStatus('Load failed');
             showToast('Load failed: ' + (error as Error).message, 'error');
