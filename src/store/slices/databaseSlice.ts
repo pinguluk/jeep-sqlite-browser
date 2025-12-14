@@ -12,6 +12,7 @@ interface DatabaseState {
     dbInfo: string;
     staleWarning: boolean;
     autoRefresh: boolean;
+    isReloading: boolean; // Prevents race condition during refresh
 }
 
 const initialState: DatabaseState = {
@@ -22,6 +23,7 @@ const initialState: DatabaseState = {
     dbInfo: '',
     staleWarning: false,
     autoRefresh: false,
+    isReloading: false,
 };
 
 // Async thunks
@@ -115,9 +117,10 @@ export const checkForChanges = createAsyncThunk(
     'database/checkChanges',
     async (_, { getState }) => {
         const state = getState() as { database: DatabaseState };
-        const { currentDb, currentHash } = state.database;
+        const { currentDb, currentHash, isReloading } = state.database;
 
-        if (!currentDb || !currentHash) return { changed: false };
+        // Skip if no database, no hash, or currently reloading
+        if (!currentDb || !currentHash || isReloading) return { changed: false };
 
         const inspectedTabId = getInspectedTabId();
 
@@ -192,14 +195,24 @@ const databaseSlice = createSlice({
                 state.currentHash = action.payload.hash;
                 state.dbInfo = action.payload.dbInfo;
                 state.staleWarning = false;
+                state.isReloading = false;
+            })
+            .addCase(reloadDatabaseData.pending, (state) => {
+                state.isReloading = true;
+                state.staleWarning = false; // Clear warning immediately when starting reload
             })
             .addCase(reloadDatabaseData.fulfilled, (state, action) => {
                 state.currentHash = action.payload.hash;
                 state.dbInfo = action.payload.dbInfo;
                 state.staleWarning = false;
+                state.isReloading = false;
+            })
+            .addCase(reloadDatabaseData.rejected, (state) => {
+                state.isReloading = false;
             })
             .addCase(checkForChanges.fulfilled, (state, action) => {
-                if (action.payload.changed) {
+                // Only set stale warning if not currently reloading
+                if (action.payload.changed && !state.isReloading) {
                     state.staleWarning = true;
                 }
             })

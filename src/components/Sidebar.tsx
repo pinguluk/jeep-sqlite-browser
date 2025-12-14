@@ -21,7 +21,7 @@ export function Sidebar() {
     };
 
     return (
-        <aside className="w-52 bg-sidebar border-r flex flex-col overflow-hidden">
+        <aside className="w-max-[2rem] bg-sidebar border-r flex flex-col overflow-hidden">
             {/* Databases Section */}
             <div className="p-2 border-b max-h-[40%] flex flex-col">
                 <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground px-2 py-1">
@@ -78,7 +78,9 @@ export function Sidebar() {
                             >
                                 <Table2 className="w-4 h-4 shrink-0" />
                                 <span className="flex-1 truncate">{table.name}</span>
-                                <span className="text-xs bg-muted px-1.5 py-0.5 rounded-full">{table.rowCount}</span>
+                                <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-full font-medium">
+                                    {table.rowCount.toLocaleString()}
+                                </span>
                             </div>
                         ))
                     )}
