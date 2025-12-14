@@ -1,9 +1,18 @@
 import { Play } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { setSqlQuery, clearQuery, executeQuery } from '@/store/slices/querySlice';
-import { refreshTables } from '@/store/slices/tableSlice';
+import { refreshTablesAsync } from '@/store/slices/tableSlice';
 import { setStatus } from '@/store/slices/uiSlice';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 
 export function QueryTab() {
     const dispatch = useAppDispatch();
@@ -11,71 +20,69 @@ export function QueryTab() {
 
     const handleRun = () => {
         dispatch(executeQuery());
-        dispatch(refreshTables());
+        dispatch(refreshTablesAsync());
         if (queryResults && 'rows' in queryResults) {
             dispatch(setStatus(`${queryResults.rows?.length || 0} rows`));
         }
     };
 
     return (
-        <div className="flex flex-col h-full gap-2 p-2">
+        <div className="flex flex-col h-full gap-3 p-3">
             <div className="flex flex-col gap-2">
-                <textarea
+                <Textarea
                     value={sqlQuery}
                     onChange={(e) => dispatch(setSqlQuery(e.target.value))}
                     onKeyDown={(e) => {
                         if (e.ctrlKey && e.key === 'Enter') handleRun();
                     }}
                     placeholder="SELECT * FROM table_name LIMIT 10"
-                    className="w-full h-24 bg-devtools-bg-tertiary border border-devtools-border rounded p-2 text-xs font-mono resize-none focus:outline-none focus:border-devtools-accent-blue text-devtools-text-primary placeholder:text-devtools-text-muted"
+                    className="h-24 font-mono text-sm resize-none"
                 />
                 <div className="flex gap-2">
                     <Button size="sm" onClick={handleRun}>
-                        <Play className="w-3 h-3" />
+                        <Play className="w-3.5 h-3.5 mr-1" />
                         Run (Ctrl+Enter)
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => dispatch(clearQuery())}>
+                    <Button variant="outline" size="sm" onClick={() => dispatch(clearQuery())}>
                         Clear
                     </Button>
                 </div>
             </div>
 
-            <div className="flex-1 overflow-auto">
+            <div className="flex-1 overflow-auto rounded-md border">
                 {!queryResults ? (
-                    <div className="flex items-center justify-center h-full text-devtools-text-muted text-xs">
+                    <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
                         Query results will appear here
                     </div>
                 ) : 'error' in queryResults ? (
-                    <div className="text-devtools-accent-red text-xs p-2">Error: {queryResults.error}</div>
+                    <div className="text-destructive text-sm p-3">Error: {queryResults.error}</div>
                 ) : 'message' in queryResults ? (
-                    <div className="text-devtools-accent-green text-xs p-2">{queryResults.message}</div>
+                    <div className="text-green-500 text-sm p-3">{queryResults.message}</div>
                 ) : (
-                    <table className="w-full text-xs border-collapse">
-                        <thead className="sticky top-0 bg-devtools-bg-tertiary">
-                            <tr>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
                                 {queryResults.columns?.map((col: string, i: number) => (
-                                    <th key={i} className="px-2 py-1 text-left border-b border-devtools-border">
-                                        {col}
-                                    </th>
+                                    <TableHead key={i}>{col}</TableHead>
                                 ))}
-                            </tr>
-                        </thead>
-                        <tbody>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
                             {queryResults.rows?.map((row: any[], rowIndex: number) => (
-                                <tr key={rowIndex} className="hover:bg-devtools-bg-hover">
+                                <TableRow key={rowIndex}>
                                     {row.map((value, colIndex) => (
-                                        <td key={colIndex} className="px-2 py-1 border-b border-devtools-border">
+                                        <TableCell key={colIndex}>
                                             {value === null ? (
-                                                <span className="text-devtools-text-muted italic">NULL</span>
+                                                <span className="text-muted-foreground italic">NULL</span>
                                             ) : (
                                                 String(value)
                                             )}
-                                        </td>
+                                        </TableCell>
                                     ))}
-                                </tr>
+                                </TableRow>
                             ))}
-                        </tbody>
-                    </table>
+                        </TableBody>
+                    </Table>
                 )}
             </div>
         </div>

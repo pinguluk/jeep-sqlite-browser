@@ -7,9 +7,10 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { closeModal, setEditRowData } from '@/store/slices/uiSlice';
-import { refreshTables } from '@/store/slices/tableSlice';
+import { refreshTablesAsync } from '@/store/slices/tableSlice';
 import { saveToIndexedDB } from '@/store/slices/databaseSlice';
 import { dbHandler } from '@/utils/database-handler';
 import { showToast } from '@/utils/helpers';
@@ -46,7 +47,7 @@ export function InsertEditModal() {
             }
 
             dispatch(closeModal());
-            dispatch(refreshTables());
+            await dispatch(refreshTablesAsync());
             await dispatch(saveToIndexedDB());
         } catch (error) {
             showToast('Save failed: ' + (error as Error).message, 'error');
@@ -59,20 +60,21 @@ export function InsertEditModal() {
 
     return (
         <Dialog open={modalOpen} onOpenChange={(open) => !open && dispatch(closeModal())}>
-            <DialogContent className="max-w-md max-h-[80vh] overflow-auto">
+            <DialogContent className="max-w-md max-h-[80vh] overflow-hidden flex flex-col">
                 <DialogHeader>
                     <DialogTitle>{modalMode === 'insert' ? 'Insert Row' : 'Edit Row'}</DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-3 py-4">
+                <div className="flex-1 overflow-auto space-y-4 py-4">
                     {tableStructure.map((col) => (
-                        <div key={col.name} className="flex flex-col gap-1">
-                            <label className="text-xs text-devtools-text-secondary">
+                        <div key={col.name} className="grid gap-2">
+                            <Label htmlFor={col.name} className="text-sm">
                                 {col.name}
-                                <span className="ml-1 text-devtools-text-muted">({col.type})</span>
-                                {col.pk && <span className="ml-1 text-devtools-accent-yellow">[PK]</span>}
-                            </label>
+                                <span className="ml-2 text-muted-foreground text-xs">({col.type})</span>
+                                {col.pk && <span className="ml-1 text-yellow-500 text-xs">[PK]</span>}
+                            </Label>
                             <Input
+                                id={col.name}
                                 value={editRowData[col.name] ?? ''}
                                 onChange={(e) => updateField(col.name, e.target.value)}
                                 placeholder={col.dflt_value !== null ? String(col.dflt_value) : 'NULL'}
@@ -82,12 +84,10 @@ export function InsertEditModal() {
                 </div>
 
                 <DialogFooter>
-                    <Button variant="ghost" size="sm" onClick={() => dispatch(closeModal())}>
+                    <Button variant="outline" onClick={() => dispatch(closeModal())}>
                         Cancel
                     </Button>
-                    <Button size="sm" onClick={handleSave}>
-                        Save
-                    </Button>
+                    <Button onClick={handleSave}>Save</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

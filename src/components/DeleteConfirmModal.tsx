@@ -1,15 +1,16 @@
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { closeDeleteConfirm } from '@/store/slices/uiSlice';
-import { refreshTables } from '@/store/slices/tableSlice';
+import { refreshTablesAsync } from '@/store/slices/tableSlice';
 import { saveToIndexedDB } from '@/store/slices/databaseSlice';
 import { dbHandler } from '@/utils/database-handler';
 import { showToast } from '@/utils/helpers';
@@ -36,7 +37,7 @@ export function DeleteConfirmModal() {
             }
 
             dispatch(closeDeleteConfirm());
-            dispatch(refreshTables());
+            await dispatch(refreshTablesAsync());
             await dispatch(saveToIndexedDB());
             showToast('Row deleted', 'success');
         } catch (error) {
@@ -45,24 +46,21 @@ export function DeleteConfirmModal() {
     };
 
     return (
-        <Dialog open={confirmDeleteOpen} onOpenChange={(open) => !open && dispatch(closeDeleteConfirm())}>
-            <DialogContent className="max-w-sm">
-                <DialogHeader>
-                    <DialogTitle>Confirm Delete</DialogTitle>
-                    <DialogDescription>
-                        Are you sure you want to delete this row? This action cannot be undone.
-                    </DialogDescription>
-                </DialogHeader>
-
-                <DialogFooter>
-                    <Button variant="ghost" size="sm" onClick={() => dispatch(closeDeleteConfirm())}>
-                        Cancel
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={handleDelete}>
+        <AlertDialog open={confirmDeleteOpen} onOpenChange={(open) => !open && dispatch(closeDeleteConfirm())}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete this row from the database.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                         Delete
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     );
 }

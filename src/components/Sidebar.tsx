@@ -1,8 +1,9 @@
 import { Database, Table2 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { loadDatabase } from '@/store/slices/databaseSlice';
-import { selectTable, loadTables } from '@/store/slices/tableSlice';
+import { selectTableAsync, loadTablesAsync } from '@/store/slices/tableSlice';
 import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export function Sidebar() {
     const dispatch = useAppDispatch();
@@ -12,66 +13,76 @@ export function Sidebar() {
 
     const handleSelectDatabase = async (db: typeof databases[0]) => {
         await dispatch(loadDatabase(db));
-        dispatch(loadTables());
+        dispatch(loadTablesAsync());
+    };
+
+    const handleSelectTable = (tableName: string) => {
+        dispatch(selectTableAsync(tableName));
     };
 
     return (
-        <aside className="w-48 bg-devtools-bg-secondary border-r border-devtools-border flex flex-col overflow-hidden">
+        <aside className="w-52 bg-sidebar border-r flex flex-col overflow-hidden">
             {/* Databases Section */}
-            <div className="p-1.5 border-b border-devtools-border max-h-[40%] overflow-y-auto">
-                <div className="flex items-center gap-1 text-[10px] font-semibold uppercase text-devtools-text-muted px-1.5 py-1">
-                    <Database className="w-3 h-3" />
+            <div className="p-2 border-b max-h-[40%] flex flex-col">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground px-2 py-1">
+                    <Database className="w-3.5 h-3.5" />
                     <span>Databases</span>
                 </div>
-                <div className="overflow-y-auto">
+                <ScrollArea className="flex-1">
                     {loading ? (
-                        <div className="text-xs text-devtools-text-secondary px-2 py-1">Scanning...</div>
+                        <div className="text-xs text-muted-foreground px-2 py-1">Scanning...</div>
                     ) : databases.length === 0 ? (
-                        <div className="text-xs text-devtools-text-muted px-2 py-1">No databases found</div>
+                        <div className="text-xs text-muted-foreground px-2 py-1">No databases found</div>
                     ) : (
                         databases.map((db, i) => (
                             <div
                                 key={i}
                                 onClick={() => handleSelectDatabase(db)}
                                 className={cn(
-                                    "flex items-center gap-1.5 px-2 py-1 rounded cursor-pointer text-xs transition-colors",
-                                    currentDb?.key === db.key ? "bg-devtools-bg-active" : "hover:bg-devtools-bg-hover"
+                                    'flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer text-sm transition-colors',
+                                    currentDb?.key === db.key
+                                        ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                                        : 'hover:bg-sidebar-accent/50'
                                 )}
                             >
-                                <Database className="w-3 h-3" />
-                                <span className="truncate" title={db.key}>{db.key}</span>
+                                <Database className="w-4 h-4 shrink-0" />
+                                <span className="truncate" title={db.key}>
+                                    {db.key}
+                                </span>
                             </div>
                         ))
                     )}
-                </div>
+                </ScrollArea>
             </div>
 
             {/* Tables Section */}
-            <div className="flex-1 p-1.5 overflow-y-auto">
-                <div className="flex items-center gap-1 text-[10px] font-semibold uppercase text-devtools-text-muted px-1.5 py-1">
-                    <Table2 className="w-3 h-3" />
+            <div className="flex-1 p-2 flex flex-col overflow-hidden">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground px-2 py-1">
+                    <Table2 className="w-3.5 h-3.5" />
                     <span>Tables</span>
                 </div>
-                <div className="overflow-y-auto">
+                <ScrollArea className="flex-1">
                     {tables.length === 0 ? (
-                        <div className="text-xs text-devtools-text-muted px-2 py-1">Select a database</div>
+                        <div className="text-xs text-muted-foreground px-2 py-1">Select a database</div>
                     ) : (
                         tables.map((table) => (
                             <div
                                 key={table.name}
-                                onClick={() => dispatch(selectTable(table.name))}
+                                onClick={() => handleSelectTable(table.name)}
                                 className={cn(
-                                    "flex items-center gap-1.5 px-2 py-1 rounded cursor-pointer text-xs transition-colors",
-                                    currentTable === table.name ? "bg-devtools-bg-active" : "hover:bg-devtools-bg-hover"
+                                    'flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer text-sm transition-colors',
+                                    currentTable === table.name
+                                        ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                                        : 'hover:bg-sidebar-accent/50'
                                 )}
                             >
-                                <Table2 className="w-3 h-3" />
+                                <Table2 className="w-4 h-4 shrink-0" />
                                 <span className="flex-1 truncate">{table.name}</span>
-                                <span className="text-[10px] bg-devtools-bg-tertiary px-1 rounded">{table.rowCount}</span>
+                                <span className="text-xs bg-muted px-1.5 py-0.5 rounded-full">{table.rowCount}</span>
                             </div>
                         ))
                     )}
-                </div>
+                </ScrollArea>
             </div>
         </aside>
     );
