@@ -214,6 +214,69 @@ export default defineContentScript({
       });
     }
 
+    /**
+     * Get hash of database in page context (lightweight - no data transfer)
+     */
+    function getDatabaseHash(idbName: string, storeName: string, key: string): Promise<string | null> {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(idbName);
+
+        request.onerror = () => reject(request.error);
+
+        request.onsuccess = () => {
+          const db = request.result;
+
+          try {
+            const tx = db.transaction(storeName, 'readonly');
+            const store = tx.objectStore(storeName);
+            const getRequest = store.get(key);
+
+            getRequest.onsuccess = async () => {
+              db.close();
+              const data = getRequest.result;
+              let buffer: ArrayBuffer | null = null;
+
+              // Normalize data to ArrayBuffer
+              if (data instanceof Uint8Array) {
+                buffer = data.buffer;
+              } else if (data instanceof ArrayBuffer) {
+                buffer = data;
+              } else if (data && data.buffer instanceof ArrayBuffer) {
+                buffer = data.buffer;
+              } else if (data && data.data) {
+                if (data.data instanceof Uint8Array) {
+                  buffer = data.data.buffer;
+                } else if (Array.isArray(data.data)) {
+                  buffer = new Uint8Array(data.data).buffer;
+                }
+              }
+
+              if (buffer) {
+                try {
+                  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+                  const hashArray = Array.from(new Uint8Array(hashBuffer));
+                  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+                  resolve(hashHex);
+                } catch (e) {
+                  resolve(null);
+                }
+              } else {
+                resolve(null);
+              }
+            };
+
+            getRequest.onerror = () => {
+              db.close();
+              reject(getRequest.error);
+            };
+          } catch (e) {
+            db.close();
+            reject(e);
+          }
+        };
+      });
+    }
+
     // Listen for messages from popup/devtools
     chrome.runtime.onMessage.addListener((message: ContentMessage, sender, sendResponse) => {
       (async () => {
@@ -246,6 +309,16 @@ export default defineContentScript({
               const uint8Data = new Uint8Array(message.data);
               await saveDatabase(message.idbName, message.storeName, message.key, uint8Data);
               sendResponse({ success: true } as MessageResponse);
+              break;
+            }
+
+            case 'getHash': {
+              const hash = await getDatabaseHash(message.idbName, message.storeName, message.key);
+              if (hash) {
+                sendResponse({ success: true, data: hash } as MessageResponse);
+              } else {
+                sendResponse({ success: false, error: 'Could not compute hash' } as MessageResponse);
+              }
               break;
             }
 

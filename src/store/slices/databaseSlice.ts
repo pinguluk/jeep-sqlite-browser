@@ -92,18 +92,20 @@ export const checkForChanges = createAsyncThunk(
         if (!currentDb || !currentHash) return { changed: false };
 
         const inspectedTabId = getInspectedTabId();
+
+        // Use lightweight hash check - computes hash in page context, no data transfer
         const response = await sendToContentScript({
-            action: 'extract',
+            action: 'getHash',
             tabId: inspectedTabId,
-            ...currentDb,
+            idbName: currentDb.idbName,
+            storeName: currentDb.storeName,
+            key: currentDb.key,
         });
 
         if (!response?.success || !response.data) return { changed: false };
 
-        const newData = new Uint8Array(response.data);
-        const newHash = await computeHash(newData);
-
-        return { changed: newHash !== currentHash, newHash, newData: Array.from(newData) };
+        const newHash = response.data as string;
+        return { changed: newHash !== currentHash, newHash };
     }
 );
 

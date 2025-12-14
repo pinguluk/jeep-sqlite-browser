@@ -63,7 +63,14 @@ export interface SaveMessage {
     data: number[];
 }
 
-export type ContentMessage = ScanMessage | ListKeysMessage | ExtractMessage | SaveMessage;
+export interface GetHashMessage {
+    action: 'getHash';
+    idbName: string;
+    storeName: string;
+    key: string;
+}
+
+export type ContentMessage = ScanMessage | ListKeysMessage | ExtractMessage | SaveMessage | GetHashMessage;
 
 export interface MessageResponse<T = any> {
     success: boolean;
