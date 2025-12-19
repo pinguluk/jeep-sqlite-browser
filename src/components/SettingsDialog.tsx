@@ -15,7 +15,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
     loadSettings,
     saveSettings,
-    type WasmSource,
     WASM_SOURCE_LABELS,
 } from '@/utils/settings';
 import { dbHandler } from '@/utils/database-handler';
@@ -26,7 +25,7 @@ import { clearTables } from '@/store/slices/tableSlice';
 export function SettingsDialog() {
     const dispatch = useAppDispatch();
     const [open, setOpen] = useState(false);
-    const [wasmSource, setWasmSource] = useState<WasmSource>(() => loadSettings().wasmSource);
+    const [wasmSource, setWasmSource] = useState<string>(() => loadSettings().wasmSource);
     const [isApplying, setIsApplying] = useState(false);
 
     const handleApply = async () => {
@@ -85,7 +84,7 @@ export function SettingsDialog() {
                         </p>
                         <RadioGroup
                             value={wasmSource}
-                            onValueChange={(value) => setWasmSource(value as WasmSource)}
+                            onValueChange={(value) => setWasmSource(value)}
                             className="space-y-2"
                         >
                             {Object.entries(WASM_SOURCE_LABELS).map(([key, label]) => (

@@ -71,19 +71,3 @@ export function applyDarkMode(isDark: boolean): void {
     document.documentElement.classList.remove("dark");
   }
 }
-
-/**
- * Get the WASM URL for the given source setting
- * Returns null for 'auto' mode - handler should try to detect website's WASM
- */
-export function getWasmUrl(source: WasmSource): string | null {
-  if (source === "auto") {
-    // Auto mode returns null - database handler will try to detect website's WASM
-    return null;
-  }
-  if (source in WASM_LOCAL_FILES) {
-    return chrome.runtime.getURL(WASM_LOCAL_FILES[source]);
-  }
-  // Fallback to bundled
-  return chrome.runtime.getURL("sql-wasm.wasm");
-}

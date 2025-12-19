@@ -11,6 +11,7 @@ import type {
   QueryResult,
 } from "../types/types";
 import { loadSettings, WASM_SOURCE_LABELS } from "./settings";
+import { sendToContentScript, getInspectedTabId } from "./devtools-comm";
 
 export class DatabaseHandler {
   private db: Database | null = null;
@@ -19,6 +20,7 @@ export class DatabaseHandler {
   private currentDbName: string | null = null;
   private currentDbData: Uint8Array | null = null;
   private currentWasmSource: string | null = null;
+  private websiteWasmBinary: Uint8Array | null = null;
 
   /**
    * Initialize sql.js with WebAssembly
@@ -31,40 +33,63 @@ export class DatabaseHandler {
     if (this.initialized && this.currentWasmSource === source) return;
 
     try {
-      let wasmUrl: string;
+      let wasmBinary: Uint8Array | null = null;
+      let wasmUrl: string | null = null;
 
       if (source === "auto") {
-        // Auto mode: try to detect website's sql-wasm.wasm
-        // Look for common CDN patterns that websites might use
-        const websiteWasmUrls = [
-          // Common CDN locations websites might use
-          "/sql-wasm.wasm",
-          "/assets/sql-wasm.wasm",
-          "/wasm/sql-wasm.wasm",
-        ];
+        // Auto mode: try to get website's WASM via content script
+        try {
+          const inspectedTabId = getInspectedTabId();
+          const response = await sendToContentScript({
+            action: "getWebsiteWasm",
+            tabId: inspectedTabId,
+          });
 
-        // For auto mode, fall back to bundled since we can't reliably detect website's WASM
-        // The website's WASM would need to be served from the same origin
-        console.log(
-          "Auto mode: using bundled WASM (website WASM detection not reliable in extension context)"
-        );
-        wasmUrl = chrome.runtime.getURL("sql-wasm.wasm");
-      } else if (source in WASM_SOURCE_LABELS) {
-        // Use locally bundled WASM file
-        wasmUrl = chrome.runtime.getURL(WASM_LOCAL_FILES[source]);
+          if (response?.success && response.data?.wasm) {
+            console.log(
+              `Auto mode: Found website WASM at ${response.data.path}`
+            );
+            wasmBinary = new Uint8Array(response.data.wasm);
+            this.websiteWasmBinary = wasmBinary;
+          } else {
+            console.log(
+              "Auto mode: Website WASM not found, falling back to bundled"
+            );
+            wasmUrl = chrome.runtime.getURL("sql-wasm.wasm");
+          }
+        } catch (error) {
+          console.log(
+            "Auto mode: Failed to get website WASM, falling back to bundled",
+            error
+          );
+          wasmUrl = chrome.runtime.getURL("sql-wasm.wasm");
+        }
+      } else if (source !== "auto" && source in WASM_SOURCE_LABELS) {
+        // Use locally bundled WASM file based on version
+        const filename = WASM_SOURCE_LABELS[source]; // e.g., "sql-wasm-1.11.0.wasm"
+        wasmUrl = chrome.runtime.getURL(filename);
       } else {
         // Fallback to default bundled
-        wasmUrl = chrome.runtime.getURL("sql-wasm.wasm");
+        wasmUrl = chrome.runtime.getURL("sql-wasm-1.11.0.wasm");
       }
 
-      // Initialize sql.js with WASM
-      this.SQL = await initSqlJs({
-        locateFile: () => wasmUrl,
-      });
+      // Initialize sql.js with WASM (either binary or URL)
+      if (wasmBinary) {
+        this.SQL = await initSqlJs({
+          wasmBinary: wasmBinary.buffer as ArrayBuffer,
+        });
+      } else {
+        this.SQL = await initSqlJs({
+          locateFile: () => wasmUrl!,
+        });
+      }
+
       this.initialized = true;
       this.currentWasmSource = source;
       console.log(
-        `sql.js initialized successfully with WASM source: ${source} (${wasmUrl})`
+        `sql.js initialized successfully with WASM source: ${source}${
+          wasmUrl ? ` (${wasmUrl})` : " (website binary)"
+        }`
       );
     } catch (error) {
       console.error("Failed to initialize sql.js:", error);
@@ -76,7 +101,7 @@ export class DatabaseHandler {
    * Reinitialize sql.js with a different WASM source
    * This will close the current database
    */
-  async reinit(wasmSource: WasmSource): Promise<void> {
+  async reinit(wasmSource: string): Promise<void> {
     // Close current database if open
     this.close();
 
@@ -92,7 +117,7 @@ export class DatabaseHandler {
   /**
    * Get current WASM source
    */
-  getWasmSource(): WasmSource | null {
+  getWasmSource(): string | null {
     return this.currentWasmSource;
   }
 
