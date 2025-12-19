@@ -104,9 +104,8 @@ pnpm build
 ```
 src/
 ├── types.ts                        # TypeScript interfaces
-├── lib/
-│   └── utils.ts                    # Utility functions (cn, etc.)
 ├── utils/
+│   ├── cn.ts                       # Classname utility (shadcn/ui)
 │   ├── helpers.ts                  # Utility functions
 │   ├── settings.ts                 # Settings persistence (localStorage)
 │   ├── database-handler.ts         # SQL.js wrapper
@@ -140,6 +139,12 @@ src/
         ├── index.html
         ├── main.tsx
         └── PanelApp.tsx
+
+example/                            # Demo Vue app using Jeep SQLite
+├── src/
+│   ├── App.vue                     # Main CRUD demo
+│   └── services/sqlite.ts          # SQLite service
+└── package.json                    # Separate dependencies
 ```
 
 ## Support

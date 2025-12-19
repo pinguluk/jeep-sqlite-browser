@@ -9,5 +9,8 @@
         "./src/*"
       ]
     }
-  }
+  },
+  "exclude": [
+    "example"
+  ]
 }
