@@ -13,12 +13,21 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 
-const VERSION = '1.0.0';
-
 export function Header() {
     const dispatch = useAppDispatch();
     const { tables } = useAppSelector((state) => state.table);
     const [isDark, setIsDark] = useState(() => loadSettings().darkMode);
+    const [version, setVersion] = useState<string>('');
+
+    // Get the extension version from manifest
+    useEffect(() => {
+        try {
+            const manifest = browser.runtime.getManifest();
+            setVersion(manifest.version);
+        } catch {
+            setVersion('unknown');
+        }
+    }, []);
 
     // Apply dark mode when it changes
     useEffect(() => {
@@ -39,7 +48,7 @@ export function Header() {
             <div className="flex items-center gap-2 text-sm font-semibold">
                 <Database className="w-5 h-5 text-primary" />
                 <span>Jeep SQLite Browser</span>
-                <span className="text-xs text-muted-foreground font-normal">v{VERSION}</span>
+                <span className="text-xs text-muted-foreground font-normal">v{version}</span>
                 
                 {/* Donate Button */}
                 <Button 
@@ -67,7 +76,7 @@ export function Header() {
                                 Jeep SQLite Browser
                             </DialogTitle>
                             <DialogDescription className="space-y-3 pt-2">
-                                <p>Version {VERSION}</p>
+                                <p>Version {version}</p>
                                 <p>
                                     A DevTools extension for browsing and managing Jeep SQLite 
                                     databases stored in IndexedDB.

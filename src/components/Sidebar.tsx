@@ -59,7 +59,8 @@ export function Sidebar() {
                                 <Database className="w-4 h-4 shrink-0" />
                                 <span className="truncate" title={db.key}>
                                     {db.key}{" "}
-                                    {tables.length > 0 && (
+                                    {/* Only show table/row counts for the currently selected database */}
+                                    {currentDb?.key === db.key && tables.length > 0 && (
                                         <span className="text-xs text-muted-foreground font-normal">
                                             • {tables.length} tables, {totalRows.toLocaleString()} rows
                                         </span>
