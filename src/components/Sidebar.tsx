@@ -3,7 +3,7 @@ import { Database, Table2, Loader2 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { loadDatabase } from '@/store/slices/databaseSlice';
 import { selectTableAsync, loadTablesAsync } from '@/store/slices/tableSlice';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/cn';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 export function Sidebar() {
