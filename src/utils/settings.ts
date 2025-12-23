@@ -9,17 +9,23 @@ const STORAGE_KEY = "jeep-sqlite-browser-settings";
 const storage =
   typeof browser !== "undefined" ? browser.storage.local : chrome.storage.local;
 
+// Supported WASM versions in order of preference (newest first)
+export const SUPPORTED_WASM_VERSIONS = ["1.13.0", "1.12.0", "1.11.0"] as const;
+
 export const WASM_SOURCE_LABELS: Record<string, string> = {
-  auto: "Website's WASM (Auto-detect)",
+  auto: "Auto-detect (try all versions)",
   "1.13.0": "sql-wasm-1.13.0.wasm",
   "1.12.0": "sql-wasm-1.12.0.wasm",
   "1.11.0": "sql-wasm-1.11.0.wasm",
+  custom: "Custom CDN URLs",
 };
 
 export interface Settings {
   darkMode: boolean;
   autoRefresh: boolean;
   wasmSource: string;
+  customWasmUrl?: string;
+  customScriptUrl?: string;
 }
 
 /**

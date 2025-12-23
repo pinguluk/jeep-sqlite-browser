@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Settings as SettingsIcon } from 'lucide-react';
+import { Settings as SettingsIcon, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
     Dialog,
     DialogContent,
@@ -21,28 +22,55 @@ import { dbHandler } from '@/utils/database-handler';
 import { useAppDispatch } from '@/store/hooks';
 import { scanDatabases } from '@/store/slices/databaseSlice';
 import { clearTables } from '@/store/slices/tableSlice';
+import { toast } from 'sonner';
 
 export function SettingsDialog() {
     const dispatch = useAppDispatch();
     const [open, setOpen] = useState(false);
     const [wasmSource, setWasmSource] = useState<string>('1.13.0');
+    const [customWasmUrl, setCustomWasmUrl] = useState<string>('');
+    const [customScriptUrl, setCustomScriptUrl] = useState<string>('');
     const [isApplying, setIsApplying] = useState(false);
 
     // Load settings on mount
     useEffect(() => {
         loadSettings().then((settings) => {
             setWasmSource(settings.wasmSource);
+            setCustomWasmUrl(settings.customWasmUrl || '');
+            setCustomScriptUrl(settings.customScriptUrl || '');
         });
     }, []);
 
     const handleApply = async () => {
         setIsApplying(true);
         try {
-            // Save the setting
-            await saveSettings({ wasmSource });
+            // Validate custom CDN fields if custom mode selected
+            if (wasmSource === 'custom' && !customWasmUrl) {
+                toast.error('Custom WASM URL is required');
+                setIsApplying(false);
+                return;
+            }
+
+            // Save the settings
+            await saveSettings({
+                wasmSource,
+                customWasmUrl: wasmSource === 'custom' ? customWasmUrl : undefined,
+                customScriptUrl: wasmSource === 'custom' ? customScriptUrl : undefined,
+            });
             
             // Reinitialize sql.js with new WASM source
-            await dbHandler.reinit(wasmSource);
+            const result = await dbHandler.reinit(wasmSource);
+            
+            // Show toast notification with result
+            if (result.success) {
+                if (result.isAutoDetected) {
+                    toast.success(`Auto-detected: Using sql.js v${result.version}`);
+                } else if (result.version === 'custom') {
+                    toast.success('Loaded custom WASM from CDN');
+                } else {
+                    toast.success(`Initialized with sql.js v${result.version}`);
+                }
+            }
             
             // Clear current state and rescan
             dispatch(clearTables());
@@ -51,7 +79,7 @@ export function SettingsDialog() {
             setOpen(false);
         } catch (error) {
             console.error('Failed to apply WASM settings:', error);
-            alert('Failed to apply settings. Check console for details.');
+            toast.error(`Failed to apply settings: ${(error as Error).message}`);
         } finally {
             setIsApplying(false);
         }
@@ -62,6 +90,8 @@ export function SettingsDialog() {
             // Reset to current saved setting when opening
             const settings = await loadSettings();
             setWasmSource(settings.wasmSource);
+            setCustomWasmUrl(settings.customWasmUrl || '');
+            setCustomScriptUrl(settings.customScriptUrl || '');
         }
         setOpen(newOpen);
     };
@@ -105,6 +135,46 @@ export function SettingsDialog() {
                             ))}
                         </RadioGroup>
                     </div>
+
+                    {/* Custom CDN URL inputs */}
+                    {wasmSource === 'custom' && (
+                        <div className="space-y-3 border-t pt-4">
+                            <div className="flex items-start gap-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded-md text-xs text-amber-600 dark:text-amber-400">
+                                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                                <span>
+                                    Chrome MV3 restricts remote code execution. Custom CDN URLs may only work in Firefox or developer mode.
+                                </span>
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <Label htmlFor="customWasmUrl" className="text-sm">
+                                    WASM URL <span className="text-red-500">*</span>
+                                </Label>
+                                <Input
+                                    id="customWasmUrl"
+                                    type="url"
+                                    placeholder="https://cdnjs.cloudflare.com/.../sql-wasm.wasm"
+                                    value={customWasmUrl}
+                                    onChange={(e) => setCustomWasmUrl(e.target.value)}
+                                    className="text-xs"
+                                />
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <Label htmlFor="customScriptUrl" className="text-sm">
+                                    Script URL (optional)
+                                </Label>
+                                <Input
+                                    id="customScriptUrl"
+                                    type="url"
+                                    placeholder="https://cdnjs.cloudflare.com/.../sql-wasm.js"
+                                    value={customScriptUrl}
+                                    onChange={(e) => setCustomScriptUrl(e.target.value)}
+                                    className="text-xs"
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <DialogFooter>

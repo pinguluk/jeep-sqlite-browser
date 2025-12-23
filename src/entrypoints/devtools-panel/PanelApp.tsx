@@ -18,6 +18,8 @@ import { QueryTab } from '@/components/QueryTab';
 import { InsertEditModal } from '@/components/InsertEditModal';
 import { DeleteConfirmModal } from '@/components/DeleteConfirmModal';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Toaster } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 
 function PanelContent() {
     const dispatch = useAppDispatch();
@@ -26,9 +28,10 @@ function PanelContent() {
 
     // Load settings and apply dark mode on mount
     useEffect(() => {
-        const settings = loadSettings();
-        applyDarkMode(settings.darkMode);
-        dispatch(setAutoRefresh(settings.autoRefresh));
+        loadSettings().then((settings) => {
+            applyDarkMode(settings.darkMode);
+            dispatch(setAutoRefresh(settings.autoRefresh));
+        });
     }, [dispatch]);
 
     // Initialize on mount
@@ -36,11 +39,18 @@ function PanelContent() {
         const init = async () => {
             dispatch(setStatus('Initializing...'));
             try {
-                await dbHandler.init();
+                const result = await dbHandler.init();
                 dispatch(setStatus('Ready'));
+                
+                // Show toast with detected WASM version
+                if (result.isAutoDetected && result.version) {
+                    toast.success(`Auto-detected: Using sql.js v${result.version}`);
+                }
+                
                 dispatch(scanDatabases());
             } catch (error) {
                 dispatch(setStatus('Init failed'));
+                toast.error(`Initialization failed: ${(error as Error).message}`);
             }
         };
         init();
@@ -137,6 +147,7 @@ export default function PanelApp() {
     return (
         <Provider store={store}>
             <PanelContent />
+            <Toaster position="top-right" richColors />
         </Provider>
     );
 }
