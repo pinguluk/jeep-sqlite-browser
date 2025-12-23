@@ -1,0 +1,86 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Get version from package.json
+        id: pkg_version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "Extension version: $version"
+
+      - name: Build and Zip Chrome Extension
+        run: pnpm zip
+
+      - name: Build and Zip Firefox Extension
+        run: pnpm zip:firefox
+
+      - name: Find built zip files
+        id: find_zips
+        run: |
+          chrome_zip=$(find .output -name "*-chrome.zip" | head -1)
+          firefox_zip=$(find .output -name "*-firefox.zip" | head -1)
+          echo "chrome_zip=$chrome_zip" >> $GITHUB_OUTPUT
+          echo "firefox_zip=$firefox_zip" >> $GITHUB_OUTPUT
+          echo "Found Chrome zip: $chrome_zip"
+          echo "Found Firefox zip: $firefox_zip"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.pkg_version.outputs.version }}
+          name: Release v${{ steps.pkg_version.outputs.version }}
+          body: |
+            ## Jeep SQLite Browser v${{ steps.pkg_version.outputs.version }}
+
+            ### Downloads
+            - **Chrome Extension**: `jeep-sqlite-browser-${{ steps.pkg_version.outputs.version }}-chrome.zip`
+            - **Firefox Extension**: `jeep-sqlite-browser-${{ steps.pkg_version.outputs.version }}-firefox.zip`
+
+            ### Installation
+            #### Chrome
+            1. Download the Chrome zip file
+            2. Extract the contents
+            3. Go to `chrome://extensions/`
+            4. Enable "Developer mode"
+            5. Click "Load unpacked" and select the extracted folder
+
+            #### Firefox
+            1. Download the Firefox zip file
+            2. Go to `about:debugging#/runtime/this-firefox`
+            3. Click "Load Temporary Add-on"
+            4. Select the downloaded zip file
+          files: |
+            ${{ steps.find_zips.outputs.chrome_zip }}
+            ${{ steps.find_zips.outputs.firefox_zip }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true

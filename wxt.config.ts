@@ -1,6 +1,7 @@
 import { defineConfig } from "wxt";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import pkg from "./package.json";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -16,7 +17,7 @@ export default defineConfig({
   }),
   manifest: {
     name: "Jeep SQLite Browser",
-    version: "1.0.0",
+    version: pkg.version,
     description: "Browse and manage Jeep SQLite databases stored in IndexedDB",
     permissions: ["activeTab", "storage", "scripting"],
     host_permissions: ["<all_urls>"],
