@@ -18,11 +18,19 @@ A Chrome DevTools extension for browsing and managing Jeep SQLite databases stor
 - 🔄 **Auto-Refresh** - Monitor for database changes with configurable refresh
 - 🎨 **Modern UI** - Built with shadcn/ui components
 
+## Screenshots
+<img width="20%" alt="Screenshot 1" src="https://github.com/user-attachments/assets/8edae10e-ca64-4ea9-abf6-b25430db6ee9" />
+<img width="20%" alt="Screenshot 2" src="https://github.com/user-attachments/assets/645e8bec-f876-4280-839e-bf299e0e8708" />
+<img width="20%" alt="Screenshot 3" src="https://github.com/user-attachments/assets/1b81ef4e-4775-4b11-adfb-450f92815b5a" />
+<img width="20%" alt="Screenshot 4" src="https://github.com/user-attachments/assets/33f5f0a9-a251-477b-bf60-f402973f8c4e" />
+<img width="20%" alt="Screenshot 5" src="https://github.com/user-attachments/assets/e35bf767-d9b7-4c5d-b857-02db14c776d7" />
+
+
 ## Installation
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 18+
+- [Node.js](https://nodejs.org/) 22+
 - Package manager: [pnpm](https://pnpm.io/) (recommended), [yarn](https://yarnpkg.com/), or [npm](https://www.npmjs.com/)
 
 ### From Source
