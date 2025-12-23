@@ -1,9 +1,11 @@
 /**
  * DatabaseHandler - Handles sql.js initialization and database operations
  * TypeScript port of db-handler.js
+ *
+ * Supports multiple sql.js versions by dynamically loading the correct JS file
  */
 
-import initSqlJs, { Database, SqlJsStatic } from "sql.js";
+import type { Database, SqlJsStatic } from "sql.js";
 import type {
   TableInfo,
   ColumnInfo,
@@ -16,6 +18,66 @@ import {
   SUPPORTED_WASM_VERSIONS,
 } from "./settings";
 import { sendToContentScript, getInspectedTabId } from "./devtools-comm";
+
+// Track loaded sql.js versions to avoid loading the same script multiple times
+const loadedVersions = new Map<
+  string,
+  (config: { locateFile: (file: string) => string }) => Promise<SqlJsStatic>
+>();
+
+/**
+ * Dynamically load a specific version of sql.js
+ * Each version needs its matching JS file to work with its WASM binary
+ */
+async function loadSqlJsVersion(
+  version: string
+): Promise<
+  (config: { locateFile: (file: string) => string }) => Promise<SqlJsStatic>
+> {
+  // Return cached version if already loaded
+  if (loadedVersions.has(version)) {
+    return loadedVersions.get(version)!;
+  }
+
+  const scriptUrl = chrome.runtime.getURL(`sql-wasm-${version}.min.js`);
+
+  return new Promise((resolve, reject) => {
+    // Check if script is already loaded by checking for global
+    const existingInit = (window as any)[
+      `initSqlJs_${version.replace(/\./g, "_")}`
+    ];
+    if (existingInit) {
+      loadedVersions.set(version, existingInit);
+      resolve(existingInit);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = scriptUrl;
+    script.type = "text/javascript";
+
+    script.onload = () => {
+      // sql.js sets initSqlJs globally
+      const initFn = (window as any).initSqlJs;
+      if (initFn) {
+        // Store with version-specific name to avoid conflicts when switching versions
+        (window as any)[`initSqlJs_${version.replace(/\./g, "_")}`] = initFn;
+        loadedVersions.set(version, initFn);
+        resolve(initFn);
+      } else {
+        reject(
+          new Error(`Failed to load sql.js v${version}: initSqlJs not found`)
+        );
+      }
+    };
+
+    script.onerror = () => {
+      reject(new Error(`Failed to load sql.js script for version ${version}`));
+    };
+
+    document.head.appendChild(script);
+  });
+}
 
 export class DatabaseHandler {
   private db: Database | null = null;
@@ -83,6 +145,8 @@ export class DatabaseHandler {
         const filename = WASM_SOURCE_LABELS[source];
         const wasmUrl = chrome.runtime.getURL(filename);
 
+        // Load version-specific sql.js and initialize
+        const initSqlJs = await loadSqlJsVersion(source);
         this.SQL = await initSqlJs({
           locateFile: () => wasmUrl,
         });
@@ -104,6 +168,8 @@ export class DatabaseHandler {
         // Fallback to default bundled
         const wasmUrl = chrome.runtime.getURL("sql-wasm-1.13.0.wasm");
 
+        // Load version-specific sql.js and initialize
+        const initSqlJs = await loadSqlJsVersion("1.13.0");
         this.SQL = await initSqlJs({
           locateFile: () => wasmUrl,
         });
@@ -155,6 +221,8 @@ export class DatabaseHandler {
 
         console.log(`Auto-detect: Trying sql.js v${version}...`);
 
+        // Load version-specific sql.js and initialize
+        const initSqlJs = await loadSqlJsVersion(version);
         this.SQL = await initSqlJs({
           locateFile: () => wasmUrl,
         });
@@ -218,6 +286,9 @@ export class DatabaseHandler {
     try {
       console.log(`Custom CDN: Loading WASM from ${wasmUrl}`);
 
+      // For custom CDN, we need to use the bundled initSqlJs with custom WASM URL
+      // Note: Custom script URL support would require dynamic script loading
+      const initSqlJs = await loadSqlJsVersion("1.13.0");
       this.SQL = await initSqlJs({
         locateFile: () => wasmUrl,
       });

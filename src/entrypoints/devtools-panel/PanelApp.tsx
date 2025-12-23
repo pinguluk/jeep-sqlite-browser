@@ -42,15 +42,19 @@ function PanelContent() {
                 const result = await dbHandler.init();
                 dispatch(setStatus('Ready'));
                 
-                // Show toast with detected WASM version
+                // Show toast only for auto-detect mode with 3s auto-dismiss
                 if (result.isAutoDetected && result.version) {
-                    toast.success(`Auto-detected: Using sql.js v${result.version}`);
+                    toast.success(`Auto-detected: Using sql.js v${result.version}`, {
+                        duration: 3000,
+                    });
                 }
                 
                 dispatch(scanDatabases());
             } catch (error) {
                 dispatch(setStatus('Init failed'));
-                toast.error(`Initialization failed: ${(error as Error).message}`);
+                toast.error(`Initialization failed: ${(error as Error).message}`, {
+                    duration: 3000,
+                });
             }
         };
         init();

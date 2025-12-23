@@ -61,14 +61,14 @@ export function SettingsDialog() {
             // Reinitialize sql.js with new WASM source
             const result = await dbHandler.reinit(wasmSource);
             
-            // Show toast notification with result
+            // Show toast notification with result (3s auto-dismiss)
             if (result.success) {
                 if (result.isAutoDetected) {
-                    toast.success(`Auto-detected: Using sql.js v${result.version}`);
+                    toast.success(`Auto-detected: Using sql.js v${result.version}`, { duration: 3000 });
                 } else if (result.version === 'custom') {
-                    toast.success('Loaded custom WASM from CDN');
+                    toast.success('Loaded custom WASM from CDN', { duration: 3000 });
                 } else {
-                    toast.success(`Initialized with sql.js v${result.version}`);
+                    toast.success(`Initialized with sql.js v${result.version}`, { duration: 3000 });
                 }
             }
             
@@ -79,7 +79,7 @@ export function SettingsDialog() {
             setOpen(false);
         } catch (error) {
             console.error('Failed to apply WASM settings:', error);
-            toast.error(`Failed to apply settings: ${(error as Error).message}`);
+            toast.error(`Failed to apply settings: ${(error as Error).message}`, { duration: 3000 });
         } finally {
             setIsApplying(false);
         }
