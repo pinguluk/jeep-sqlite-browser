@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Settings as SettingsIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,14 +25,21 @@ import { clearTables } from '@/store/slices/tableSlice';
 export function SettingsDialog() {
     const dispatch = useAppDispatch();
     const [open, setOpen] = useState(false);
-    const [wasmSource, setWasmSource] = useState<string>(() => loadSettings().wasmSource);
+    const [wasmSource, setWasmSource] = useState<string>('1.13.0');
     const [isApplying, setIsApplying] = useState(false);
+
+    // Load settings on mount
+    useEffect(() => {
+        loadSettings().then((settings) => {
+            setWasmSource(settings.wasmSource);
+        });
+    }, []);
 
     const handleApply = async () => {
         setIsApplying(true);
         try {
             // Save the setting
-            saveSettings({ wasmSource });
+            await saveSettings({ wasmSource });
             
             // Reinitialize sql.js with new WASM source
             await dbHandler.reinit(wasmSource);
@@ -50,10 +57,11 @@ export function SettingsDialog() {
         }
     };
 
-    const handleOpenChange = (newOpen: boolean) => {
+    const handleOpenChange = async (newOpen: boolean) => {
         if (newOpen) {
             // Reset to current saved setting when opening
-            setWasmSource(loadSettings().wasmSource);
+            const settings = await loadSettings();
+            setWasmSource(settings.wasmSource);
         }
         setOpen(newOpen);
     };

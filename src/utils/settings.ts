@@ -1,8 +1,13 @@
 /**
  * Settings persistence utility for Jeep SQLite Browser
+ * Uses chrome.storage.local for persistent storage across extension contexts
  */
 
 const STORAGE_KEY = "jeep-sqlite-browser-settings";
+
+// Browser compatibility: use browser.storage.local for Firefox, chrome.storage.local for Chrome
+const storage =
+  typeof browser !== "undefined" ? browser.storage.local : chrome.storage.local;
 
 export const WASM_SOURCE_LABELS: Record<string, string> = {
   auto: "Website's WASM (Auto-detect)",
@@ -35,17 +40,17 @@ function getDefaultSettings(): Settings {
   return {
     darkMode: detectBrowserDarkMode(),
     autoRefresh: true,
-    wasmSource: "1.11.0",
+    wasmSource: "1.13.0",
   };
 }
 
-export function loadSettings(): Settings {
+export async function loadSettings(): Promise<Settings> {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const result = await storage.get(STORAGE_KEY);
+    const stored = result[STORAGE_KEY];
     if (stored) {
-      const parsed = JSON.parse(stored);
       // Merge with defaults for any missing keys
-      return { ...getDefaultSettings(), ...parsed };
+      return { ...getDefaultSettings(), ...stored };
     }
   } catch (e) {
     console.log("Failed to load settings:", e);
@@ -54,11 +59,11 @@ export function loadSettings(): Settings {
   return getDefaultSettings();
 }
 
-export function saveSettings(settings: Partial<Settings>): void {
+export async function saveSettings(settings: Partial<Settings>): Promise<void> {
   try {
-    const current = loadSettings();
+    const current = await loadSettings();
     const updated = { ...current, ...settings };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    await storage.set({ [STORAGE_KEY]: updated });
   } catch (e) {
     console.log("Failed to save settings:", e);
   }

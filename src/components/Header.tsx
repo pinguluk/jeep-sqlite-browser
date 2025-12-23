@@ -17,8 +17,18 @@ import { SettingsDialog } from "./SettingsDialog";
 export function Header() {
   const dispatch = useAppDispatch();
   const { tables } = useAppSelector((state) => state.table);
-  const [isDark, setIsDark] = useState(() => loadSettings().darkMode);
+  const [isDark, setIsDark] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [version, setVersion] = useState<string>("");
+
+  // Load settings on mount
+  useEffect(() => {
+    loadSettings().then((settings) => {
+      setIsDark(settings.darkMode);
+      applyDarkMode(settings.darkMode);
+      setIsLoaded(true);
+    });
+  }, []);
 
   // Get the extension version from manifest
   useEffect(() => {
@@ -30,11 +40,12 @@ export function Header() {
     }
   }, []);
 
-  // Apply dark mode when it changes
+  // Apply dark mode when it changes (skip saving on initial load)
   useEffect(() => {
+    if (!isLoaded) return;
     applyDarkMode(isDark);
     saveSettings({ darkMode: isDark });
-  }, [isDark]);
+  }, [isDark, isLoaded]);
 
   const toggleDarkMode = () => {
     setIsDark(!isDark);

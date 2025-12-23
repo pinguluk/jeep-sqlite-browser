@@ -27,7 +27,8 @@ export class DatabaseHandler {
    * @param wasmSource - Optional override, uses settings if not provided
    */
   async init(wasmSource?: string): Promise<void> {
-    const source = wasmSource ?? loadSettings().wasmSource;
+    const settings = await loadSettings();
+    const source = wasmSource ?? settings.wasmSource;
 
     // Skip if already initialized with same source
     if (this.initialized && this.currentWasmSource === source) return;
@@ -70,7 +71,7 @@ export class DatabaseHandler {
         wasmUrl = chrome.runtime.getURL(filename);
       } else {
         // Fallback to default bundled
-        wasmUrl = chrome.runtime.getURL("sql-wasm-1.11.0.wasm");
+        wasmUrl = chrome.runtime.getURL("sql-wasm-1.13.0.wasm");
       }
 
       // Initialize sql.js with WASM (either binary or URL)

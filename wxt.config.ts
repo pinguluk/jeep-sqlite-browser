@@ -16,7 +16,7 @@ export default defineConfig({
   }),
   manifest: {
     name: "Jeep SQLite Browser",
-    version: "1.0.1",
+    version: "1.0.0",
     description: "Browse and manage Jeep SQLite databases stored in IndexedDB",
     permissions: ["activeTab", "storage", "scripting"],
     host_permissions: ["<all_urls>"],
