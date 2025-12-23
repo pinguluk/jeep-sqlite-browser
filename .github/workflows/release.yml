@@ -61,20 +61,23 @@ jobs:
           body: |
             ## Jeep SQLite Browser v${{ steps.pkg_version.outputs.version }}
 
-            ### Downloads
-            - **Chrome Extension**: `jeep-sqlite-browser-${{ steps.pkg_version.outputs.version }}-chrome.zip`
-            - **Firefox Extension**: `jeep-sqlite-browser-${{ steps.pkg_version.outputs.version }}-firefox.zip`
-
             ### Installation
+
+            **Recommended:** Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/jeep-sqlite-browser/ocgeealadeabmhponndjebghfkbfbnch)
+
+            ---
+
+            ### Manual Installation
+
             #### Chrome
-            1. Download the Chrome zip file
+            1. Download `jeep-sqlite-browser-${{ steps.pkg_version.outputs.version }}-chrome.zip`
             2. Extract the contents
             3. Go to `chrome://extensions/`
             4. Enable "Developer mode"
             5. Click "Load unpacked" and select the extracted folder
 
             #### Firefox
-            1. Download the Firefox zip file
+            1. Download `jeep-sqlite-browser-${{ steps.pkg_version.outputs.version }}-firefox.zip`
             2. Go to `about:debugging#/runtime/this-firefox`
             3. Click "Load Temporary Add-on"
             4. Select the downloaded zip file
